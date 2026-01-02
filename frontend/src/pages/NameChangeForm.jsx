@@ -506,6 +506,7 @@ const NameChangeForm = () => {
             </div>
           </div>
         )}
+        </div>
       </div>
     </div>
   );
