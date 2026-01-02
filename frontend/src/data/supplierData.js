@@ -2,7 +2,7 @@
 export const suppliers = {
   gas: {
     name: 'Gas',
-    nameGuj: 'ગેસ',
+    nameHindi: 'गैस',
     suppliers: [
       {
         id: 'gujarat-gas',
@@ -76,7 +76,7 @@ export const suppliers = {
   },
   electricity: {
     name: 'Electricity',
-    nameGuj: 'વીજળી',
+    nameHindi: 'बिजली',
     suppliers: [
       {
         id: 'torrent-power',
@@ -142,7 +142,7 @@ export const suppliers = {
   },
   water: {
     name: 'Water',
-    nameGuj: 'પાણી',
+    nameHindi: 'पानी',
     suppliers: [
       {
         id: 'gwssb',
@@ -209,12 +209,12 @@ export const suppliers = {
   },
   property: {
     name: 'Property',
-    nameGuj: 'મિલકત',
+    nameHindi: 'संपत्ति',
     suppliers: [
       {
         id: 'anyror',
         name: 'AnyROR Gujarat',
-        fullName: 'Revenue Department - Land Records (Form 6/ફરફાર)',
+        fullName: 'Revenue Department - Land Records (Form 6)',
         type: 'Government',
         areas: 'All Gujarat - 7/12, 8A Records',
         portal: 'https://anyror.gujarat.gov.in',
@@ -226,7 +226,7 @@ export const suppliers = {
       {
         id: 'e-dhara',
         name: 'e-Dhara',
-        fullName: 'Revenue Department - Mutation (Form 6/ફરફાર)',
+        fullName: 'Revenue Department - Mutation (Form 6)',
         type: 'Government',
         areas: 'All Gujarat - Land Mutation',
         portal: 'https://landrecords.gujarat.gov.in',
@@ -238,7 +238,7 @@ export const suppliers = {
       {
         id: 'e-nagar',
         name: 'e-Nagar',
-        fullName: 'Urban Development - Property Tax (વહેચણી/વારસાઈ)',
+        fullName: 'Urban Development - Property Tax',
         type: 'Government',
         areas: 'Urban Areas - Property Tax',
         portal: 'https://enagar.gujarat.gov.in',
@@ -263,7 +263,7 @@ export const suppliers = {
       {
         id: 'mamlatdar',
         name: 'Mamlatdar / Tehsildar',
-        fullName: 'Taluka Revenue Office (વારસાઈ અરજી)',
+        fullName: 'Taluka Revenue Office',
         type: 'Government',
         areas: 'All Gujarat Talukas',
         portal: 'https://revenuedepartment.gujarat.gov.in',

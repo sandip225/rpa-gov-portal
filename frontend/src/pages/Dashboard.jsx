@@ -44,7 +44,7 @@ const Dashboard = () => {
     {
       id: 'electricity',
       name: 'Electricity',
-      nameGuj: 'વીજળી',
+      nameHindi: 'बिजली',
       description: 'Name change for electricity connection',
       icon: Zap,
       gradient: 'from-amber-400 to-orange-500',
@@ -54,7 +54,7 @@ const Dashboard = () => {
     {
       id: 'gas',
       name: 'Gas',
-      nameGuj: 'ગેસ',
+      nameHindi: 'गैस',
       description: 'Name change for gas connection',
       icon: Flame,
       gradient: 'from-red-400 to-rose-600',
@@ -64,7 +64,7 @@ const Dashboard = () => {
     {
       id: 'water',
       name: 'Water',
-      nameGuj: 'પાણી',
+      nameHindi: 'पानी',
       description: 'Name change for water connection',
       icon: Droplets,
       gradient: 'from-cyan-400 to-blue-500',
@@ -74,7 +74,7 @@ const Dashboard = () => {
     {
       id: 'property',
       name: 'Property',
-      nameGuj: 'મિલકત',
+      nameHindi: 'संपत्ति',
       description: 'Name change for property records',
       icon: Building,
       gradient: 'from-emerald-400 to-green-600',
@@ -205,7 +205,7 @@ const Dashboard = () => {
                       </div>
                       <div>
                         <h3 className="text-lg font-bold text-white">{service.name}</h3>
-                        <p className="text-white/80 text-xs">{service.nameGuj}</p>
+                        <p className="text-white/80 text-xs">{service.nameHindi}</p>
                       </div>
                     </div>
                     <ArrowRight className="w-5 h-5 text-white/60 group-hover:translate-x-1 transition-transform" />

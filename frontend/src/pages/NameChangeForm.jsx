@@ -147,18 +147,18 @@ const NameChangeForm = () => {
   }
 
   return (
-    <div className="max-w-3xl mx-auto">
+    <div className="w-full">
       {/* Back Button */}
       <button
         onClick={() => step === 1 ? navigate('/services') : setStep(step - 1)}
-        className="flex items-center gap-2 text-gray-600 hover:text-gray-800 mb-4"
+        className="flex items-center gap-2 text-gray-600 hover:text-gray-800 mb-4 px-6"
       >
         <ArrowLeft className="w-5 h-5" /> 
         {step === 1 ? 'Back to Services' : 'Back'}
       </button>
 
       {/* Header */}
-      <div className={`bg-gradient-to-r ${gradient} rounded-t-2xl p-6`}>
+      <div className={`bg-gradient-to-r ${gradient} p-6`}>
         <div className="flex items-center gap-4">
           <div className="bg-white/25 backdrop-blur-sm p-3 rounded-xl">
             <Icon className="w-8 h-8 text-white" />
@@ -167,12 +167,12 @@ const NameChangeForm = () => {
             <h1 className="text-2xl font-bold text-white">
               {categoryData.name} - Name Change
             </h1>
-            <p className="text-white/80">{categoryData.nameGuj} - નામ બદલો</p>
+            <p className="text-white/80">{categoryData.nameHindi} - नाम बदलें</p>
           </div>
         </div>
       </div>
 
-      <div className="bg-white rounded-b-2xl shadow-lg p-6">
+      <div className="bg-white shadow-lg p-6">
         {/* Step Indicator */}
         <div className="flex items-center justify-center gap-4 mb-8">
           {[1, 2, 3].map((s) => (
@@ -199,45 +199,117 @@ const NameChangeForm = () => {
               Choose the provider where you want to apply for name change
             </p>
 
-            <div className="grid gap-3">
-              {supplierList.map((supplier) => (
-                <button
-                  key={supplier.id}
-                  onClick={() => handleSupplierSelect(supplier)}
-                  className="w-full flex items-center justify-between p-4 border-2 border-gray-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all text-left group"
-                >
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-semibold text-gray-800 group-hover:text-blue-700">
-                        {supplier.name}
-                      </span>
-                      <span className={`text-xs px-2 py-0.5 rounded-full ${
-                        supplier.type === 'Government' 
-                          ? 'bg-green-100 text-green-700' 
-                          : 'bg-purple-100 text-purple-700'
-                      }`}>
-                        {supplier.type}
-                      </span>
-                      <span className={`text-xs px-2 py-0.5 rounded-full ${
-                        supplier.hasOnlinePortal 
-                          ? 'bg-blue-100 text-blue-700' 
-                          : 'bg-orange-100 text-orange-700'
-                      }`}>
-                        {supplier.hasOnlinePortal ? 'Online' : 'Offline'}
-                      </span>
-                    </div>
-                    {supplier.fullName && (
-                      <p className="text-sm text-gray-500">{supplier.fullName}</p>
-                    )}
-                    <p className="text-xs text-gray-400 mt-1">{supplier.areas}</p>
-                    {supplier.offlineNote && !supplier.hasOnlinePortal && (
-                      <p className="text-xs text-orange-600 mt-1">{supplier.offlineNote}</p>
-                    )}
+            {/* All categories - Two separate boxes for Government and Private */}
+            {['gas', 'electricity', 'water', 'property'].includes(category) ? (
+              <div className="grid grid-cols-2 gap-4">
+                {/* Government Box */}
+                <div className="border border-gray-300 rounded-lg overflow-hidden shadow-sm">
+                  <div className="bg-green-600 px-4 py-3">
+                    <h3 className="text-white font-bold text-sm">🏛️ Government</h3>
                   </div>
-                  <ExternalLink className="w-5 h-5 text-gray-400 group-hover:text-blue-600" />
-                </button>
-              ))}
-            </div>
+                  <div className="p-4 space-y-2">
+                    {supplierList.filter(s => s.type === 'Government').map((supplier) => (
+                      <button
+                        key={supplier.id}
+                        onClick={() => handleSupplierSelect(supplier)}
+                        className="w-full flex items-center justify-between p-3 bg-white border border-gray-200 rounded hover:bg-gray-50 transition-all text-left group"
+                      >
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="font-semibold text-gray-800 text-sm">
+                              {supplier.name}
+                            </span>
+                            <span className={`text-xs px-2 py-0.5 rounded ${
+                              supplier.hasOnlinePortal 
+                                ? 'bg-blue-100 text-blue-700' 
+                                : 'bg-orange-100 text-orange-700'
+                            }`}>
+                              {supplier.hasOnlinePortal ? 'Online' : 'Offline'}
+                            </span>
+                          </div>
+                          <p className="text-xs text-gray-500 mt-1">{supplier.areas}</p>
+                        </div>
+                        <ExternalLink className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Private Box */}
+                <div className="border border-gray-300 rounded-lg overflow-hidden shadow-sm">
+                  <div className="bg-red-600 px-4 py-3">
+                    <h3 className="text-white font-bold text-sm">🏢 Private</h3>
+                  </div>
+                  <div className="p-4 space-y-2">
+                    {supplierList.filter(s => s.type === 'Private').map((supplier) => (
+                      <button
+                        key={supplier.id}
+                        onClick={() => handleSupplierSelect(supplier)}
+                        className="w-full flex items-center justify-between p-3 bg-white border border-gray-200 rounded hover:bg-gray-50 transition-all text-left group"
+                      >
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="font-semibold text-gray-800 text-sm">
+                              {supplier.name}
+                            </span>
+                            <span className={`text-xs px-2 py-0.5 rounded ${
+                              supplier.hasOnlinePortal 
+                                ? 'bg-blue-100 text-blue-700' 
+                                : 'bg-orange-100 text-orange-700'
+                            }`}>
+                              {supplier.hasOnlinePortal ? 'Online' : 'Offline'}
+                            </span>
+                          </div>
+                          <p className="text-xs text-gray-500 mt-1">{supplier.areas}</p>
+                        </div>
+                        <ExternalLink className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              /* Other categories - Original single list */
+              <div className="grid gap-3">
+                {supplierList.map((supplier) => (
+                  <button
+                    key={supplier.id}
+                    onClick={() => handleSupplierSelect(supplier)}
+                    className="w-full flex items-center justify-between p-4 border-2 border-gray-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all text-left group"
+                  >
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-semibold text-gray-800 group-hover:text-blue-700">
+                          {supplier.name}
+                        </span>
+                        <span className={`text-xs px-2 py-0.5 rounded-full ${
+                          supplier.type === 'Government' 
+                            ? 'bg-green-100 text-green-700' 
+                            : 'bg-purple-100 text-purple-700'
+                        }`}>
+                          {supplier.type}
+                        </span>
+                        <span className={`text-xs px-2 py-0.5 rounded-full ${
+                          supplier.hasOnlinePortal 
+                            ? 'bg-blue-100 text-blue-700' 
+                            : 'bg-orange-100 text-orange-700'
+                        }`}>
+                          {supplier.hasOnlinePortal ? 'Online' : 'Offline'}
+                        </span>
+                      </div>
+                      {supplier.fullName && (
+                        <p className="text-sm text-gray-500">{supplier.fullName}</p>
+                      )}
+                      <p className="text-xs text-gray-400 mt-1">{supplier.areas}</p>
+                      {supplier.offlineNote && !supplier.hasOnlinePortal && (
+                        <p className="text-xs text-orange-600 mt-1">{supplier.offlineNote}</p>
+                      )}
+                    </div>
+                    <ExternalLink className="w-5 h-5 text-gray-400 group-hover:text-blue-600" />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         )}
 

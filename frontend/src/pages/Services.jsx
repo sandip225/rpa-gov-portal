@@ -6,7 +6,7 @@ const Services = () => {
     {
       id: 'electricity',
       name: 'Electricity',
-      nameGuj: 'વીજળી',
+      nameHindi: 'बिजली',
       description: 'Name change application for electricity connection',
       icon: Zap,
       gradient: 'from-amber-400 to-orange-500',
@@ -23,7 +23,7 @@ const Services = () => {
     {
       id: 'gas',
       name: 'Gas',
-      nameGuj: 'ગેસ',
+      nameHindi: 'गैस',
       description: 'Name change application for gas connection',
       icon: Flame,
       gradient: 'from-red-400 to-rose-600',
@@ -38,7 +38,7 @@ const Services = () => {
     {
       id: 'water',
       name: 'Water',
-      nameGuj: 'પાણી',
+      nameHindi: 'पानी',
       description: 'Name change application for water connection',
       icon: Droplets,
       gradient: 'from-cyan-400 to-blue-500',
@@ -54,7 +54,7 @@ const Services = () => {
     {
       id: 'property',
       name: 'Property',
-      nameGuj: 'મિલકત',
+      nameHindi: 'संपत्ति',
       description: 'Name change application for property records',
       icon: Building,
       gradient: 'from-emerald-400 to-green-600',
@@ -79,7 +79,7 @@ const Services = () => {
           </div>
           <div>
             <h1 className="text-2xl font-bold text-gray-800">Name Change Services</h1>
-            <p className="text-gray-500">ગુજરાત સરકારી સેવાઓ • Apply for name change in your utility connections</p>
+            <p className="text-gray-500">गुजरात सरकारी सेवाएं • Apply for name change in your utility connections</p>
           </div>
         </div>
       </div>
@@ -108,7 +108,7 @@ const Services = () => {
                   </div>
                   <div>
                     <h2 className="text-2xl font-bold text-white">{service.name}</h2>
-                    <p className="text-white/80">{service.nameGuj}</p>
+                    <p className="text-white/80">{service.nameHindi}</p>
                   </div>
                 </div>
               </div>

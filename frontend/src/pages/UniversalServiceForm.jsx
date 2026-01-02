@@ -269,7 +269,7 @@ const UniversalServiceForm = () => {
             <h1 className="text-3xl font-bold text-gray-800">
               {service.icon} {subService.name}
             </h1>
-            <p className="text-gray-600">{subService.nameGuj} • {service.name}</p>
+            <p className="text-gray-600">{subService.nameHindi} • {service.name}</p>
           </div>
         </div>
 
