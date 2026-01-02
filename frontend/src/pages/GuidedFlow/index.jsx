@@ -8,7 +8,7 @@ import ProviderSelector from './ProviderSelector';
 import ApplicationForm from './ApplicationForm';
 import ConfirmationScreen from './ConfirmationScreen';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const API_BASE = '/api';
 
 const GuidedFlowPage = () => {
   const navigate = useNavigate();
@@ -48,7 +48,7 @@ const GuidedFlowPage = () => {
   const fetchServices = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch(`${API_BASE}/api/guided-flow/services`);
+      const response = await fetch(`${API_BASE}/guided-flow/services`);
       if (!response.ok) throw new Error('Failed to fetch services');
       const data = await response.json();
       setServices(data);
@@ -62,7 +62,7 @@ const GuidedFlowPage = () => {
   const fetchProviders = async (category) => {
     try {
       setIsLoading(true);
-      const response = await fetch(`${API_BASE}/api/guided-flow/providers/${category}`);
+      const response = await fetch(`${API_BASE}/guided-flow/providers/${category}`);
       if (!response.ok) throw new Error('Failed to fetch providers');
       const data = await response.json();
       setProviders(data.providers);
@@ -78,7 +78,7 @@ const GuidedFlowPage = () => {
       setIsSubmitting(true);
       setError(null);
 
-      const response = await fetch(`${API_BASE}/api/guided-flow/applications`, {
+      const response = await fetch(`${API_BASE}/guided-flow/applications`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -179,7 +179,7 @@ const GuidedFlowPage = () => {
     <div className="min-h-screen bg-gray-50 py-4 px-4">
       {/* Error Banner */}
       {error && (
-        <div className="max-w-2xl mx-auto mb-4">
+        <div className="max-w-2xl mx-auto mb-4 relative z-50">
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-center justify-between">
             <span>{error}</span>
             <button onClick={() => setError(null)} className="text-red-500 hover:text-red-700">

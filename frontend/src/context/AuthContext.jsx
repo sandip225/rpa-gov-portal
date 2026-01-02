@@ -21,6 +21,7 @@ export const AuthProvider = ({ children }) => {
       const response = await api.get('/auth/me');
       setUser(response.data);
     } catch (error) {
+      // Silently fail - user is not authenticated
       localStorage.removeItem('token');
     } finally {
       setLoading(false);
