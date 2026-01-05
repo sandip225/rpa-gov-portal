@@ -237,26 +237,33 @@ def submit_application(
 
 @router.get("/applications", response_model=List[GuidedFlowApplicationResponse])
 def get_user_applications(
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    request: Request,
+    db: Session = Depends(get_db)
 ):
-    """Get all guided flow applications for current user"""
-    applications = db.query(GuidedFlowApplication).filter(
-        GuidedFlowApplication.user_id == current_user.id
-    ).order_by(GuidedFlowApplication.created_at.desc()).all()
+    """Get all guided flow applications for current user (if logged in)"""
+    # Get optional user
+    current_user = get_current_user_optional(request, db)
+    
+    if current_user:
+        # Return user's applications
+        applications = db.query(GuidedFlowApplication).filter(
+            GuidedFlowApplication.user_id == current_user.id
+        ).order_by(GuidedFlowApplication.created_at.desc()).all()
+    else:
+        # Return empty list for anonymous users
+        applications = []
     
     return applications
 
 @router.get("/applications/{tracking_id}", response_model=GuidedFlowApplicationResponse)
 def get_application_by_tracking_id(
     tracking_id: str,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    request: Request,
+    db: Session = Depends(get_db)
 ):
-    """Get a specific application by tracking ID"""
+    """Get a specific application by tracking ID (public access)"""
     application = db.query(GuidedFlowApplication).filter(
-        GuidedFlowApplication.tracking_id == tracking_id,
-        GuidedFlowApplication.user_id == current_user.id
+        GuidedFlowApplication.tracking_id == tracking_id
     ).first()
     
     if not application:
