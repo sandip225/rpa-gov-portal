@@ -11,7 +11,7 @@ const WelcomeScreen = ({ onStartFlow }) => {
       </div>
 
       {/* Main Content Card */}
-      <div className="relative z-10 max-w-lg w-full">
+      <div className="relative z-10 w-full max-w-6xl px-4">
         <div className="bg-white rounded-2xl md:rounded-3xl shadow-xl md:shadow-2xl overflow-hidden border-t-4 border-orange-500">
           {/* Header with Government Branding */}
           <div className="bg-gradient-to-r from-orange-500 via-white to-green-500 p-1">

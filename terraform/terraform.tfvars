@@ -1,7 +1,7 @@
 # Terraform Variables
 aws_region     = "us-east-1"
 environment    = "production"
-instance_type  = "t2.micro"
+instance_type  = "t2.small"
 key_name       = "unified-portal-key"
 use_elastic_ip = true
 

@@ -27,33 +27,33 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 flex flex-col">
-      {/* Top Tiranga Strip */}
-      <div className="h-2 bg-gradient-to-r from-orange-500 via-white to-green-600"></div>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 flex flex-col">
+      {/* Top Strip */}
+      <div className="h-1 bg-primary-500"></div>
       
       {/* Header */}
-      <div className="text-center py-6 text-white">
-        <div className="flex justify-center gap-2 mb-2">
-          <Zap className="w-6 h-6 text-yellow-400" />
-          <Flame className="w-6 h-6 text-orange-400" />
-          <Droplets className="w-6 h-6 text-cyan-400" />
-          <Building className="w-6 h-6 text-green-400" />
+      <div className="text-center py-8">
+        <div className="flex justify-center gap-3 mb-3">
+          <Zap className="w-6 h-6 text-yellow-600" />
+          <Flame className="w-6 h-6 text-orange-600" />
+          <Droplets className="w-6 h-6 text-blue-600" />
+          <Building className="w-6 h-6 text-green-600" />
         </div>
-        <h1 className="text-2xl font-bold">Gujarat Unified Services Portal</h1>
-        <p className="text-blue-200 text-sm">गुजरात एकीकृत सेवा पोर्टल</p>
+        <h1 className="text-2xl font-bold text-gray-800">Gujarat Unified Services Portal</h1>
+        <p className="text-gray-600 text-sm mt-1">गुजरात एकीकृत सेवा पोर्टल</p>
       </div>
 
       {/* Login Card */}
       <div className="flex-1 flex items-center justify-center px-4 pb-10">
         <div className="w-full max-w-md">
-          <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
+          <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
             {/* Card Header */}
-            <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-8 py-6 text-white text-center">
+            <div className="bg-primary-500 px-8 py-6 text-white text-center">
               <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Shield className="w-8 h-8" />
               </div>
               <h2 className="text-2xl font-bold">Citizen Login</h2>
-              <p className="text-blue-200 text-sm mt-1">नागरिक लॉगिन</p>
+              <p className="text-primary-100 text-sm mt-1">नागरिक लॉगिन</p>
             </div>
 
             {/* Form */}
@@ -74,7 +74,7 @@ const Login = () => {
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none transition"
+                    className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-primary-500 focus:ring-4 focus:ring-primary-100 outline-none transition-all duration-300 hover:border-gray-300"
                     placeholder="Enter your email"
                     required
                   />
@@ -91,7 +91,7 @@ const Login = () => {
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none transition"
+                    className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-primary-500 focus:ring-4 focus:ring-primary-100 outline-none transition-all duration-300 hover:border-gray-300"
                     placeholder="Enter your password"
                     required
                   />
@@ -101,7 +101,7 @@ const Login = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3.5 rounded-xl font-semibold hover:from-blue-700 hover:to-blue-800 transition-all flex items-center justify-center gap-2 shadow-lg disabled:opacity-50"
+                className="w-full bg-primary-500 text-white py-3 rounded-lg font-semibold hover:bg-primary-600 transition-colors flex items-center justify-center gap-2 shadow-sm disabled:opacity-50"
               >
                 {loading ? (
                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
@@ -116,7 +116,7 @@ const Login = () => {
               <div className="text-center pt-4 border-t border-gray-100">
                 <p className="text-gray-600">
                   Don't have an account?{' '}
-                  <Link to="/register" className="text-blue-600 font-semibold hover:underline">
+                  <Link to="/register" className="text-primary-600 font-semibold hover:text-primary-700 transition-colors duration-300 hover:underline">
                     Register Now
                   </Link>
                 </p>
@@ -125,7 +125,7 @@ const Login = () => {
           </div>
 
           {/* Footer */}
-          <div className="text-center mt-6 text-blue-200 text-sm">
+          <div className="text-center mt-6 text-gray-600 text-sm">
             <p>🇮🇳 Government of Gujarat | सत्यमेव जयते</p>
           </div>
         </div>

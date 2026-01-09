@@ -9,9 +9,11 @@ const Services = () => {
       nameHindi: 'बिजली',
       description: 'Name change application for electricity connection',
       icon: Zap,
-      gradient: 'from-amber-400 to-orange-500',
-      bgLight: 'bg-amber-50',
-      borderColor: 'border-amber-200',
+      color: 'blue',
+      bgColor: 'bg-blue-50',
+      borderColor: 'border-blue-200',
+      textColor: 'text-blue-700',
+      iconBg: 'bg-blue-100',
       providers: [
         { name: 'Torrent Power', url: 'https://connect.torrentpower.com' },
         { name: 'PGVCL', url: 'https://www.pgvcl.com' },
@@ -26,9 +28,11 @@ const Services = () => {
       nameHindi: 'गैस',
       description: 'Name change application for gas connection',
       icon: Flame,
-      gradient: 'from-red-400 to-rose-600',
-      bgLight: 'bg-red-50',
-      borderColor: 'border-red-200',
+      color: 'indigo',
+      bgColor: 'bg-indigo-50',
+      borderColor: 'border-indigo-200',
+      textColor: 'text-indigo-700',
+      iconBg: 'bg-indigo-100',
       providers: [
         { name: 'Adani Total Gas', url: 'https://www.adanigas.com' },
         { name: 'Gujarat Gas', url: 'https://iconnect.gujaratgas.com' },
@@ -41,9 +45,11 @@ const Services = () => {
       nameHindi: 'पानी',
       description: 'Name change application for water connection',
       icon: Droplets,
-      gradient: 'from-cyan-400 to-blue-500',
-      bgLight: 'bg-cyan-50',
+      color: 'cyan',
+      bgColor: 'bg-cyan-50',
       borderColor: 'border-cyan-200',
+      textColor: 'text-cyan-700',
+      iconBg: 'bg-cyan-100',
       providers: [
         { name: 'AMC Water', url: 'https://ahmedabadcity.gov.in' },
         { name: 'SMC Water', url: 'https://www.suratmunicipal.gov.in' },
@@ -57,9 +63,11 @@ const Services = () => {
       nameHindi: 'संपत्ति',
       description: 'Name change application for property records',
       icon: Building,
-      gradient: 'from-emerald-400 to-green-600',
-      bgLight: 'bg-emerald-50',
+      color: 'emerald',
+      bgColor: 'bg-emerald-50',
       borderColor: 'border-emerald-200',
+      textColor: 'text-emerald-700',
+      iconBg: 'bg-emerald-100',
       providers: [
         { name: 'AnyRoR Gujarat', url: 'https://anyror.gujarat.gov.in' },
         { name: 'e-Dhara', url: 'https://revenuedepartment.gujarat.gov.in' },
@@ -72,22 +80,22 @@ const Services = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+      <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
         <div className="flex items-center gap-4">
-          <div className="w-14 h-14 bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl flex items-center justify-center shadow-lg">
-            <Shield className="w-7 h-7 text-white" />
+          <div className="w-12 h-12 bg-primary-500 rounded-lg flex items-center justify-center">
+            <Shield className="w-6 h-6 text-white" />
           </div>
           <div>
             <h1 className="text-2xl font-bold text-gray-800">Name Change Services</h1>
-            <p className="text-gray-500">गुजरात सरकारी सेवाएं • Apply for name change in your utility connections</p>
+            <p className="text-gray-500 text-sm">गुजरात सरकारी सेवाएं • Apply for name change in your utility connections</p>
           </div>
         </div>
       </div>
 
       {/* Info Banner */}
-      <div className="bg-gradient-to-r from-orange-100 to-green-100 border-l-4 border-orange-500 p-4 rounded-lg mb-6">
-        <p className="text-sm text-gray-800">
-          <strong>How it works:</strong> Select a service category below, fill in your details, and submit your application. You can track the status in "My Applications".
+      <div className="bg-blue-50 border-l-4 border-primary-500 p-4 rounded-lg">
+        <p className="text-sm text-gray-700">
+          <strong className="text-gray-800">How it works:</strong> Select a service category below, fill in your details, and submit your application. You can track the status in "My Applications".
         </p>
       </div>
 
@@ -98,39 +106,36 @@ const Services = () => {
           return (
             <div 
               key={service.id}
-              className="bg-white rounded-lg shadow-lg border-t-4 border-orange-500 overflow-hidden hover:shadow-2xl hover:scale-105 transition-all group"
+              className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
             >
               {/* Header */}
-              <div className={`bg-gradient-to-r ${service.gradient} p-6 relative`}>
-                <div className="absolute top-0 right-0 w-20 h-20 opacity-10">
-                  <div className="w-full h-full border-4 border-white rounded-full"></div>
-                </div>
-                <div className="flex items-center gap-4 relative z-10">
-                  <div className="bg-white/25 p-3 rounded-lg border-2 border-white group-hover:bg-white/40 group-hover:scale-110 transition">
-                    <Icon className="w-8 h-8 text-white" />
+              <div className={`${service.bgColor} p-6 border-b ${service.borderColor}`}>
+                <div className="flex items-center gap-4">
+                  <div className={`${service.iconBg} p-3 rounded-lg`}>
+                    <Icon className={`w-7 h-7 ${service.textColor}`} />
                   </div>
                   <div>
-                    <h2 className="text-2xl font-bold text-white group-hover:translate-x-1 transition">{service.name}</h2>
-                    <p className="text-white/90">{service.nameHindi}</p>
+                    <h2 className={`text-xl font-bold ${service.textColor}`}>{service.name}</h2>
+                    <p className="text-gray-600 text-sm">{service.nameHindi}</p>
                   </div>
                 </div>
               </div>
 
               {/* Content */}
               <div className="p-6 space-y-4">
-                <p className="text-gray-700 text-sm">{service.description}</p>
+                <p className="text-gray-600 text-sm">{service.description}</p>
 
                 {/* Apply Button */}
                 <Link
                   to={`/${service.id}`}
-                  className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-orange-500 to-orange-600 text-white py-3 rounded-lg font-semibold hover:shadow-lg hover:scale-105 transition-all"
+                  className="w-full flex items-center justify-center gap-2 bg-primary-500 text-white py-2.5 rounded-lg font-medium hover:bg-primary-600 transition-colors"
                 >
                   Apply Now <ArrowRight className="w-4 h-4" />
                 </Link>
 
                 {/* Official Portals */}
                 <div className="border-t border-gray-200 pt-4">
-                  <p className="text-xs font-semibold text-orange-700 uppercase tracking-wider mb-2">
+                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
                     Official Portals
                   </p>
                   <div className="flex flex-wrap gap-2">
@@ -140,7 +145,7 @@ const Services = () => {
                         href={provider.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-xs px-3 py-1.5 bg-orange-100 text-orange-700 rounded-lg hover:bg-orange-200 border border-orange-300 flex items-center gap-1 transition-all hover:scale-110"
+                        className="text-xs px-3 py-1.5 bg-gray-50 text-gray-700 rounded-md hover:bg-gray-100 border border-gray-200 flex items-center gap-1 transition-colors"
                       >
                         {provider.name} <ExternalLink className="w-3 h-3" />
                       </a>
@@ -154,15 +159,15 @@ const Services = () => {
       </div>
 
       {/* Help Section */}
-      <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-lg p-6 text-white border-t-4 border-orange-500">
+      <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-bold">Need Help?</h3>
-            <p className="text-green-100 text-sm mt-1">
+            <h3 className="text-lg font-bold text-gray-800">Need Help?</h3>
+            <p className="text-gray-600 text-sm mt-1">
               Contact our support team for assistance
             </p>
           </div>
-          <button className="px-6 py-3 bg-white text-green-600 rounded-lg font-semibold hover:shadow-lg transition-all hover:scale-105">
+          <button className="px-6 py-2.5 bg-primary-500 text-white rounded-lg font-medium hover:bg-primary-600 transition-colors">
             Get Support
           </button>
         </div>

@@ -84,10 +84,10 @@ const Dashboard = () => {
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 w-full">
       
       {/* Welcome Banner */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 p-6 text-white shadow-xl">
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-700 via-slate-800 to-slate-900 p-8 text-white shadow-xl">
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mt-32"></div>
         
         <div className="relative z-10">
@@ -104,19 +104,19 @@ const Dashboard = () => {
           {/* User Info */}
           <div className="flex flex-wrap gap-4 mt-4 pt-4 border-t border-white/20 text-sm">
             {user?.city && (
-              <div className="flex items-center gap-2 text-blue-100">
+              <div className="flex items-center gap-2 text-slate-200">
                 <MapPin className="w-4 h-4" />
                 <span>{user.city}</span>
               </div>
             )}
             {user?.mobile && (
-              <div className="flex items-center gap-2 text-blue-100">
+              <div className="flex items-center gap-2 text-slate-200">
                 <Phone className="w-4 h-4" />
                 <span>{user.mobile}</span>
               </div>
             )}
             {user?.email && (
-              <div className="flex items-center gap-2 text-blue-100">
+              <div className="flex items-center gap-2 text-slate-200">
                 <Mail className="w-4 h-4" />
                 <span>{user.email}</span>
               </div>
@@ -126,8 +126,8 @@ const Dashboard = () => {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-3 gap-4">
-        <div className="bg-white rounded-xl p-4 shadow-lg border border-gray-100">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="bg-white rounded-xl p-6 shadow-lg border border-gray-100">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-2xl font-bold text-gray-800">{loading ? '...' : stats.applications}</p>
@@ -138,7 +138,7 @@ const Dashboard = () => {
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-xl p-4 shadow-lg border border-gray-100">
+        <div className="bg-white rounded-xl p-6 shadow-lg border border-gray-100">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-2xl font-bold text-yellow-600">{loading ? '...' : stats.pending}</p>
@@ -149,7 +149,7 @@ const Dashboard = () => {
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-xl p-4 shadow-lg border border-gray-100">
+        <div className="bg-white rounded-xl p-6 shadow-lg border border-gray-100">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-2xl font-bold text-green-600">{loading ? '...' : stats.completed}</p>
@@ -188,7 +188,7 @@ const Dashboard = () => {
           <Link to="/services" className="text-sm text-blue-600 hover:underline">View All</Link>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {services.map((service) => {
             const Icon = service.icon;
             return (

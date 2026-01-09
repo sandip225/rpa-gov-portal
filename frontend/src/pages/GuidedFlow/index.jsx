@@ -146,7 +146,7 @@ const GuidedFlowPage = () => {
 
       case 'service-select':
         return (
-          <div className="max-w-2xl mx-auto">
+          <div className="max-w-6xl mx-auto">
             <ChatInterface
               services={services}
               chatHistory={chatHistory}
@@ -159,7 +159,7 @@ const GuidedFlowPage = () => {
 
       case 'provider-select':
         return (
-          <div className="max-w-2xl mx-auto">
+          <div className="max-w-6xl mx-auto">
             <ProviderSelector
               category={selectedCategory?.id}
               categoryName={selectedCategory?.name}
@@ -175,7 +175,7 @@ const GuidedFlowPage = () => {
 
       case 'form':
         return (
-          <div className="max-w-2xl mx-auto">
+          <div className="max-w-6xl mx-auto">
             <ApplicationForm
               provider={selectedProvider}
               category={selectedCategory?.id}
@@ -188,7 +188,7 @@ const GuidedFlowPage = () => {
 
       case 'confirmation':
         return (
-          <div className="max-w-2xl mx-auto">
+          <div className="max-w-6xl mx-auto">
             <ConfirmationScreen
               trackingId={submissionResult?.tracking_id}
               message={submissionResult?.message}
@@ -209,28 +209,28 @@ const GuidedFlowPage = () => {
     <PageTransition>
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-4 px-4">
         {/* Header with Language Toggle */}
-        <div className="max-w-2xl mx-auto mb-6 flex justify-between items-center">
+        <div className="max-w-6xl mx-auto mb-6 flex justify-between items-center">
           <h1 className="text-2xl font-bold text-gray-800">{t('welcome')}</h1>
           <LanguageToggle />
         </div>
 
         {/* Progress Bar */}
         {currentStep !== 'welcome' && (
-          <div className="max-w-2xl mx-auto mb-6">
+          <div className="max-w-6xl mx-auto mb-6">
             <ProgressBar progress={progress} />
           </div>
         )}
 
         {/* Step Indicator */}
         {currentStep !== 'welcome' && (
-          <div className="max-w-2xl mx-auto mb-6">
+          <div className="max-w-6xl mx-auto mb-6">
             <StepIndicator currentStep={currentStepIndex + 1} totalSteps={steps.length} />
           </div>
         )}
 
         {/* Error Banner */}
         {error && (
-          <div className="max-w-2xl mx-auto mb-4 relative z-50">
+          <div className="max-w-6xl mx-auto mb-4 relative z-50">
             <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-center justify-between">
               <span>{error}</span>
               <button onClick={() => setError(null)} className="text-red-500 hover:text-red-700">

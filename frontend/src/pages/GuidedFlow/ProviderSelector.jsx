@@ -159,21 +159,6 @@ const ProviderSelector = ({
                     {t('nameChange')}
                   </motion.button>
                 )}
-
-                {/* Official Portal Link */}
-                {provider.portal_url && (
-                  <motion.a
-                    href={provider.portal_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-2 bg-gray-200 text-gray-700 py-2.5 px-4 rounded-lg font-medium text-sm hover:bg-gray-300 transition-all"
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <ExternalLink className="w-4 h-4" />
-                    Portal
-                  </motion.a>
-                )}
               </div>
 
               {/* RPA Badge */}

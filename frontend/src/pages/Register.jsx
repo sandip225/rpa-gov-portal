@@ -36,33 +36,33 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 flex flex-col">
-      {/* Top Tiranga Strip */}
-      <div className="h-2 bg-gradient-to-r from-orange-500 via-white to-green-600"></div>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 flex flex-col">
+      {/* Top Strip */}
+      <div className="h-1 bg-primary-500"></div>
       
       {/* Header */}
-      <div className="text-center py-6 text-white">
-        <div className="flex justify-center gap-2 mb-2">
-          <Zap className="w-6 h-6 text-yellow-400" />
-          <Flame className="w-6 h-6 text-orange-400" />
-          <Droplets className="w-6 h-6 text-cyan-400" />
-          <Building className="w-6 h-6 text-green-400" />
+      <div className="text-center py-8">
+        <div className="flex justify-center gap-3 mb-3">
+          <Zap className="w-6 h-6 text-yellow-600" />
+          <Flame className="w-6 h-6 text-orange-600" />
+          <Droplets className="w-6 h-6 text-blue-600" />
+          <Building className="w-6 h-6 text-green-600" />
         </div>
-        <h1 className="text-2xl font-bold">Gujarat Unified Services Portal</h1>
-        <p className="text-blue-200 text-sm">गुजरात एकीकृत सेवा पोर्टल</p>
+        <h1 className="text-2xl font-bold text-gray-800">Gujarat Unified Services Portal</h1>
+        <p className="text-gray-600 text-sm mt-1">गुजरात एकीकृत सेवा पोर्टल</p>
       </div>
 
       {/* Register Card */}
       <div className="flex-1 flex items-center justify-center px-4 pb-10">
         <div className="w-full max-w-md">
-          <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
+          <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
             {/* Card Header */}
-            <div className="bg-gradient-to-r from-green-600 to-emerald-700 px-8 py-6 text-white text-center">
+            <div className="bg-success-500 px-8 py-6 text-white text-center">
               <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
                 <UserPlus className="w-8 h-8" />
               </div>
               <h2 className="text-2xl font-bold">Citizen Registration</h2>
-              <p className="text-green-200 text-sm mt-1">नागरिक पंजीकरण</p>
+              <p className="text-green-100 text-sm mt-1">नागरिक पंजीकरण</p>
             </div>
 
             {/* Form */}
@@ -81,7 +81,7 @@ const Register = () => {
                     type="text"
                     value={formData.full_name}
                     onChange={(e) => setFormData({...formData, full_name: e.target.value})}
-                    className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:ring-4 focus:ring-green-100 outline-none transition"
+                    className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:border-success-500 focus:ring-2 focus:ring-success-100 outline-none transition-colors"
                     placeholder="Enter your full name"
                     required
                   />
@@ -96,7 +96,7 @@ const Register = () => {
                     type="email"
                     value={formData.email}
                     onChange={(e) => setFormData({...formData, email: e.target.value})}
-                    className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:ring-4 focus:ring-green-100 outline-none transition"
+                    className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:border-success-500 focus:ring-2 focus:ring-success-100 outline-none transition-colors"
                     placeholder="Enter your email"
                     required
                   />
@@ -111,7 +111,7 @@ const Register = () => {
                     type="tel"
                     value={formData.mobile}
                     onChange={(e) => setFormData({...formData, mobile: e.target.value})}
-                    className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:ring-4 focus:ring-green-100 outline-none transition"
+                    className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:border-success-500 focus:ring-2 focus:ring-success-100 outline-none transition-colors"
                     placeholder="Enter mobile number"
                     required
                   />
@@ -125,7 +125,7 @@ const Register = () => {
                   <select
                     value={formData.city}
                     onChange={(e) => setFormData({...formData, city: e.target.value})}
-                    className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:ring-4 focus:ring-green-100 outline-none transition appearance-none bg-white"
+                    className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:border-success-500 focus:ring-2 focus:ring-success-100 outline-none transition-colors appearance-none bg-white"
                     required
                   >
                     <option value="">Select your city</option>
@@ -144,7 +144,7 @@ const Register = () => {
                     type="password"
                     value={formData.password}
                     onChange={(e) => setFormData({...formData, password: e.target.value})}
-                    className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:ring-4 focus:ring-green-100 outline-none transition"
+                    className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:border-success-500 focus:ring-2 focus:ring-success-100 outline-none transition-colors"
                     placeholder="Create a password"
                     required
                   />
@@ -154,7 +154,7 @@ const Register = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-gradient-to-r from-green-600 to-emerald-700 text-white py-3.5 rounded-xl font-semibold hover:from-green-700 hover:to-emerald-800 transition-all flex items-center justify-center gap-2 shadow-lg disabled:opacity-50 mt-6"
+                className="w-full bg-success-500 text-white py-3 rounded-lg font-semibold hover:bg-success-600 transition-colors flex items-center justify-center gap-2 shadow-sm disabled:opacity-50 mt-6"
               >
                 {loading ? (
                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
@@ -169,7 +169,7 @@ const Register = () => {
               <div className="text-center pt-4 border-t border-gray-100">
                 <p className="text-gray-600">
                   Already have an account?{' '}
-                  <Link to="/login" className="text-green-600 font-semibold hover:underline">
+                  <Link to="/login" className="text-success-600 font-semibold hover:text-success-700 transition-colors duration-300 hover:underline">
                     Login Here
                   </Link>
                 </p>
@@ -178,7 +178,7 @@ const Register = () => {
           </div>
 
           {/* Footer */}
-          <div className="text-center mt-6 text-blue-200 text-sm">
+          <div className="text-center mt-6 text-gray-600 text-sm">
             <p>🇮🇳 Government of Gujarat | सत्यमेव जयते</p>
           </div>
         </div>

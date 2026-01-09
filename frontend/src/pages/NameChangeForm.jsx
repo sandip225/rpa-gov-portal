@@ -13,11 +13,12 @@ const NameChangeForm = () => {
   // Get category from URL path (e.g., /electricity -> electricity)
   const category = location.pathname.replace('/', '');
   
-  const [step, setStep] = useState(1); // 1: Select Supplier, 2: Fill Form, 3: Success
+  const [step, setStep] = useState(1); // 1: Select Supplier, 2: Fill Form, 3: RPA Processing, 4: Success
   const [selectedSupplier, setSelectedSupplier] = useState(null);
   const [formData, setFormData] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState('');
+  const [iframeUrl, setIframeUrl] = useState('');
 
   const categoryData = suppliers[category];
   const supplierList = getSuppliers(category);
@@ -80,9 +81,21 @@ const NameChangeForm = () => {
 
       await api.post(`/applications/${appResponse.data.id}/submit`);
 
-      // Open official website in new tab
-      window.open(selectedSupplier.nameChangeUrl, '_blank', 'noopener,noreferrer');
+      // Use supplier ID directly as demo site (backend will handle all)
+      const demoSite = selectedSupplier.id;
+      
+      // Prepare form data for auto-fill
+      const autoFillData = encodeURIComponent(JSON.stringify({
+        ...formData,
+        application_type: 'name_change',
+        city: formData.city || 'Ahmedabad'
+      }));
 
+      // Set iframe URL for RPA demo (same page) - use relative path for proxy
+      const demoUrl = `/demo-govt/${demoSite}?rpa=true&data=${autoFillData}`;
+      setIframeUrl(demoUrl);
+
+      // Go to RPA processing step (iframe view)
       setStep(3);
     } catch (error) {
       setMessage('Failed to save application. Please try again.');
@@ -147,19 +160,21 @@ const NameChangeForm = () => {
   }
 
   return (
-    <div className="w-full">
+    <div className="w-full -m-6">
       {/* Back Button */}
-      <button
-        onClick={() => step === 1 ? navigate('/services') : setStep(step - 1)}
-        className="flex items-center gap-2 text-gray-600 hover:text-gray-800 mb-4"
-      >
-        <ArrowLeft className="w-5 h-5" /> 
-        {step === 1 ? 'Back to Services' : 'Back'}
-      </button>
+      <div className="px-6 pt-6">
+        <button
+          onClick={() => step === 1 ? navigate('/services') : setStep(step - 1)}
+          className="flex items-center gap-2 text-gray-600 hover:text-gray-800 mb-4"
+        >
+          <ArrowLeft className="w-5 h-5" /> 
+          {step === 1 ? 'Back to Services' : 'Back'}
+        </button>
+      </div>
 
       {/* Header */}
-      <div className={`bg-gradient-to-r ${gradient} p-6 -mx-6 -mt-6 mb-6`}>
-        <div className="flex items-center gap-4 max-w-7xl mx-auto px-6">
+      <div className={`bg-gradient-to-r ${gradient} p-6 mb-6`}>
+        <div className="flex items-center gap-4 w-full px-6">
           <div className="bg-white/25 backdrop-blur-sm p-3 rounded-xl">
             <Icon className="w-8 h-8 text-white" />
           </div>
@@ -172,18 +187,18 @@ const NameChangeForm = () => {
         </div>
       </div>
 
-      <div className="bg-white shadow-lg rounded-lg p-6">
+      <div className="bg-white shadow-lg rounded-lg p-8 mx-6">
         {/* Step Indicator */}
         <div className="flex items-center justify-center gap-4 mb-8">
-          {[1, 2, 3].map((s) => (
+          {[1, 2, 3, 4].map((s) => (
             <div key={s} className="flex items-center">
               <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
                 step >= s ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-500'
               }`}>
                 {step > s ? <CheckCircle className="w-5 h-5" /> : s}
               </div>
-              {s < 3 && (
-                <div className={`w-16 h-1 mx-2 ${step > s ? 'bg-blue-600' : 'bg-gray-200'}`} />
+              {s < 4 && (
+                <div className={`w-12 h-1 mx-1 ${step > s ? 'bg-blue-600' : 'bg-gray-200'}`} />
               )}
             </div>
           ))}
@@ -466,8 +481,69 @@ const NameChangeForm = () => {
           </div>
         )}
 
-        {/* Step 3: Success */}
+        {/* Step 3: RPA Processing with iframe */}
         {step === 3 && (
+          <div>
+            <div className="text-center mb-4">
+              <h2 className="text-xl font-bold text-gray-800 mb-2">
+                🤖 RPA Bot is Processing Your Application
+              </h2>
+              <p className="text-gray-500">
+                Watch the bot automatically fill and submit your form on {selectedSupplier?.name} portal
+              </p>
+            </div>
+
+            {/* RPA Status Banner */}
+            <div className="bg-blue-100 border border-blue-300 rounded-lg p-3 mb-4 flex items-center gap-3">
+              <div className="animate-spin w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full"></div>
+              <span className="text-blue-800 font-medium">RPA Bot is filling the form automatically...</span>
+            </div>
+
+            {/* iframe Container */}
+            <div className="border-4 border-blue-500 rounded-xl overflow-hidden shadow-2xl">
+              <iframe
+                src={iframeUrl}
+                className="w-full h-[600px]"
+                title="RPA Demo Portal"
+                onLoad={(e) => {
+                  // Auto-advance to success page after form submission (detect success page)
+                  try {
+                    const iframeDoc = e.target.contentWindow.document;
+                    const isSuccessPage = iframeDoc.body.innerHTML.includes('Application Submitted');
+                    if (isSuccessPage) {
+                      setTimeout(() => setStep(4), 3000); // Wait 3 seconds to show success, then go to step 4
+                    }
+                  } catch (err) {
+                    // Cross-origin error - use timer fallback
+                    setTimeout(() => {
+                      // Auto-advance after 12 seconds (enough time for RPA to complete)
+                      setStep(4);
+                    }, 12000);
+                  }
+                }}
+              />
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex gap-4 justify-center mt-6">
+              <button
+                onClick={() => setStep(4)}
+                className="px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold"
+              >
+                ✅ Done - View Summary
+              </button>
+              <button
+                onClick={() => setStep(2)}
+                className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+              >
+                ← Back to Form
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Step 4: Success */}
+        {step === 4 && (
           <div className="text-center py-8">
             <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <CheckCircle className="w-12 h-12 text-green-600" />
@@ -482,19 +558,27 @@ const NameChangeForm = () => {
             <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6 text-left">
               <p className="font-semibold text-blue-800 mb-2">Next Steps:</p>
               <ol className="text-sm text-blue-700 space-y-1 list-decimal list-inside">
-                <li>Complete the form on the official {selectedSupplier?.name} portal</li>
-                <li>Submit your application there</li>
-                <li>Note down the reference number</li>
+                <li>The demo portal has opened with your data auto-filled</li>
+                <li>Watch the RPA bot fill the form automatically</li>
+                <li>Form will be submitted automatically</li>
                 <li>Track your application status in "My Applications"</li>
               </ol>
             </div>
 
             <div className="flex gap-4 justify-center">
               <button
-                onClick={() => window.open(selectedSupplier?.nameChangeUrl, '_blank')}
+                onClick={() => {
+                  const demoSite = selectedSupplier?.id;
+                  const autoFillData = encodeURIComponent(JSON.stringify({
+                    ...formData,
+                    application_type: 'name_change',
+                    city: formData.city || 'Ahmedabad'
+                  }));
+                  window.open(`/demo-govt/${demoSite}?rpa=true&data=${autoFillData}`, '_blank');
+                }}
                 className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
               >
-                Open Portal Again <ExternalLink className="w-4 h-4" />
+                Open Demo Portal Again <ExternalLink className="w-4 h-4" />
               </button>
               <button
                 onClick={() => navigate('/applications')}
