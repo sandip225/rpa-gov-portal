@@ -16,5 +16,17 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+    <script>
+      // Clear old caches on load
+      if ('caches' in window) {
+        caches.keys().then(names => {
+          names.forEach(name => {
+            if (name.includes('workbox-precache')) {
+              caches.delete(name);
+            }
+          });
+        });
+      }
+    </script>
   </body>
 </html>
