@@ -3,6 +3,28 @@ console.log('Gujarat Services Auto-Fill Extension Loaded');
 
 // Field mappings for different websites
 const SITE_MAPPINGS = {
+  'portal.guvnl.in': {
+    name: 'GUVNL Portal (DGVCL/PGVCL/UGVCL/MGVCL)',
+    fields: {
+      // Mobile number field
+      mobile: [
+        'input[placeholder*="Mobile"]',
+        'input[placeholder*="mobile"]',
+        'input[type="tel"]',
+        'input[name*="mobile"]',
+        'input[id*="mobile"]',
+        'input.form-control[type="text"]'
+      ],
+      // Discom dropdown
+      discom: [
+        'select[name*="discom"]',
+        'select[name*="Discom"]',
+        'select[id*="discom"]',
+        'select.form-control',
+        'select'
+      ]
+    }
+  },
   'connect.torrentpower.com': {
     name: 'Torrent Power',
     fields: {
@@ -133,31 +155,52 @@ async function fillForm() {
     return { success: false, message: 'Site not supported' };
   }
   
-  // Get stored data
+  // Get stored data from extension storage
   const data = await chrome.storage.local.get(['userData', 'autofillData']);
-  if (!data.userData) {
-    console.log('No user data found');
-    return { success: false, message: 'Please login to extension first' };
+  
+  // Also check localStorage for DGVCL data from our portal
+  let dgvclData = null;
+  try {
+    const storedData = localStorage.getItem('dgvcl_autofill_data');
+    if (storedData) {
+      dgvclData = JSON.parse(storedData);
+      // Check if data is not too old (5 minutes)
+      if (Date.now() - dgvclData.timestamp > 5 * 60 * 1000) {
+        localStorage.removeItem('dgvcl_autofill_data');
+        dgvclData = null;
+      }
+    }
+  } catch (e) {
+    console.log('No DGVCL data in localStorage');
   }
   
-  const userData = data.userData;
+  if (!data.userData && !dgvclData) {
+    console.log('No user data found');
+    return { success: false, message: 'Please login to extension first or submit form from portal' };
+  }
+  
+  const userData = data.userData || {};
   const autofillData = data.autofillData || {};
   
   // Merge all data sources
   const allData = {
     ...userData,
     full_name: userData.full_name,
+    // Use DGVCL data if available
+    mobile: dgvclData?.mobile || userData.mobile,
+    consumer_number: dgvclData?.consumer_number || autofillData.electricity_accounts?.[0]?.consumer_number || '',
     // Electricity data
     service_number: autofillData.electricity_accounts?.[0]?.service_number || '',
     t_no: autofillData.electricity_accounts?.[0]?.t_no || '',
     // Gas data
-    consumer_number: autofillData.gas_accounts?.[0]?.consumer_number || '',
     bp_number: autofillData.gas_accounts?.[0]?.bp_number || '',
     // Water data
     connection_id: autofillData.water_accounts?.[0]?.connection_id || '',
     // Property data
     survey_number: autofillData.property_accounts?.[0]?.survey_number || '',
-    property_id: autofillData.property_accounts?.[0]?.property_id || ''
+    property_id: autofillData.property_accounts?.[0]?.property_id || '',
+    // Discom selection
+    discom: dgvclData?.provider || 'DGVCL'
   };
   
   console.log('Filling form with data:', allData);
@@ -286,7 +329,37 @@ function addAutoFillButton() {
 
 // Initialize when page loads
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', addAutoFillButton);
+  document.addEventListener('DOMContentLoaded', () => {
+    addAutoFillButton();
+    autoFillOnLoad();
+  });
 } else {
   addAutoFillButton();
+  autoFillOnLoad();
+}
+
+// Auto-fill on page load if data is available
+function autoFillOnLoad() {
+  // Check if we're on DGVCL portal and have data
+  if (window.location.hostname === 'portal.guvnl.in') {
+    try {
+      const storedData = localStorage.getItem('dgvcl_autofill_data');
+      if (storedData) {
+        const data = JSON.parse(storedData);
+        // Check if data is fresh (less than 5 minutes old)
+        if (Date.now() - data.timestamp < 5 * 60 * 1000) {
+          // Wait for page to fully load
+          setTimeout(() => {
+            fillForm().then(result => {
+              if (result.success) {
+                showNotification(`Auto-filled ${result.filledCount} fields for ${data.provider}`);
+              }
+            });
+          }, 1500); // Wait 1.5 seconds for page elements to load
+        }
+      }
+    } catch (e) {
+      console.log('Error in auto-fill:', e);
+    }
+  }
 }

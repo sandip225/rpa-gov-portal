@@ -20,6 +20,7 @@
 
 | Service | Website |
 |---------|---------|
+| **DGVCL/PGVCL/UGVCL/MGVCL** | **portal.guvnl.in** ⚡ |
 | Torrent Power | connect.torrentpower.com |
 | Adani Gas | www.adanigas.com |
 | Gujarat Gas | www.gujaratgas.com |
@@ -30,11 +31,22 @@
 
 ## Features
 
+- ✅ **Auto-fill DGVCL Portal** - Submit form से direct portal पर जाएं और auto-fill हो जाए!
 - ✅ One-click form filling
 - ✅ Secure local storage (data Chrome में safely store होता है)
 - ✅ Floating auto-fill button on supported sites
 - ✅ Right-click context menu option
 - ✅ Visual feedback when fields are filled
+
+## DGVCL Auto-Fill Flow 🚀
+
+1. Unified Portal पर DGVCL service select करें
+2. Form में अपना data भरें (Consumer Number, Mobile, etc.)
+3. **"Submit & Open DGVCL Portal"** button click करें
+4. DGVCL portal automatically खुलेगा
+5. Mobile number और DGVCL dropdown **automatically fill** हो जाएगा! ✨
+
+**Note:** Auto-fill data 5 minutes तक valid रहता है।
 
 ## Requirements
 

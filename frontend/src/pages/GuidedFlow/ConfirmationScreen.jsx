@@ -9,7 +9,8 @@ const ConfirmationScreen = ({
   onTrackApplication,
   onNewApplication,
   portalUrl,
-  providerName
+  providerName,
+  formData
 }) => {
   const [copied, setCopied] = useState(false);
 
@@ -17,6 +18,21 @@ const ConfirmationScreen = ({
     navigator.clipboard.writeText(trackingId);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleOpenPortal = () => {
+    // Store form data in localStorage for chrome extension to use
+    if (formData) {
+      localStorage.setItem('dgvcl_autofill_data', JSON.stringify({
+        mobile: formData.mobile,
+        consumer_number: formData.consumer_number,
+        provider: providerName,
+        timestamp: Date.now()
+      }));
+    }
+    
+    // Open portal in new tab
+    window.open(portalUrl, '_blank');
   };
 
   return (
@@ -84,7 +100,7 @@ const ConfirmationScreen = ({
               </div>
               
               <button
-                onClick={() => window.open(portalUrl, '_blank')}
+                onClick={handleOpenPortal}
                 className="w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white py-3 px-6 rounded-xl font-semibold flex items-center justify-center gap-2 hover:shadow-lg hover:scale-[1.02] transition-all"
               >
                 <ExternalLink className="w-5 h-5" />

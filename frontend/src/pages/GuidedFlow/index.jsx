@@ -23,6 +23,7 @@ const GuidedFlowPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
+  const [submittedFormData, setSubmittedFormData] = useState(null);
   const [favorites, setFavorites] = useState(() => {
     const saved = localStorage.getItem('favoriteProviders');
     return saved ? JSON.parse(saved) : [];
@@ -86,6 +87,9 @@ const GuidedFlowPage = () => {
     try {
       setIsSubmitting(true);
       setError(null);
+      
+      // Store form data for later use
+      setSubmittedFormData(formData);
 
       const headers = {
         'Content-Type': 'application/json',
@@ -198,6 +202,7 @@ const GuidedFlowPage = () => {
               onNewApplication={startNewApplication}
               portalUrl={selectedProvider?.name_change_url || selectedProvider?.portal_url}
               providerName={selectedProvider?.name}
+              formData={submittedFormData}
             />
           </div>
         );

@@ -10,6 +10,7 @@
     "contextMenus"
   ],
   "host_permissions": [
+    "https://portal.guvnl.in/*",
     "https://connect.torrentpower.com/*",
     "https://www.torrentpower.com/*",
     "https://www.adanigas.com/*",
@@ -34,6 +35,7 @@
   "content_scripts": [
     {
       "matches": [
+        "https://portal.guvnl.in/*",
         "https://connect.torrentpower.com/*",
         "https://www.adanigas.com/*",
         "https://www.gujaratgas.com/*",
