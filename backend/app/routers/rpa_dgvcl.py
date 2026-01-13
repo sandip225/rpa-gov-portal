@@ -71,21 +71,16 @@ async def trigger_dgvcl_autofill(
         with open(temp_file, "w") as f:
             json.dump(rpa_data, f)
         
-        # Run RPA bot (synchronous for now to get screenshots)
-        rpa_result = run_rpa_bot(str(rpa_script), str(temp_file))
+        # Run RPA bot in background (async)
+        background_tasks.add_task(run_rpa_bot, str(rpa_script), str(temp_file))
         
-        if rpa_result.get("success"):
-            return RPAResponse(
-                success=True,
-                message="Login form filled! Check screenshots below. Complete captcha & OTP on portal.",
-                portal_url="https://portal.guvnl.in/login.php",
-                screenshots=rpa_result.get("screenshots", [])
-            )
-        else:
-            raise HTTPException(
-                status_code=500,
-                detail=f"RPA bot failed: {rpa_result.get('error', 'Unknown error')}"
-            )
+        # Return immediate response
+        return RPAResponse(
+            success=True,
+            message="RPA bot started! Processing in background. Check logs for screenshots.",
+            portal_url="https://portal.guvnl.in/login.php",
+            screenshots=[]
+        )
         
     except Exception as e:
         raise HTTPException(
