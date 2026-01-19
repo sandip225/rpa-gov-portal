@@ -76,6 +76,7 @@ function handleLoginPage() {
 // ============ STEP 2: OTP PAGE ============
 function handleOTPPage() {
   console.log('📱 STEP 2: OTP Page');
+  console.log('🔍 Current URL:', window.location.href);
   showMsg('📱 STEP 2: Enter OTP\n👉 Enter OTP sent to mobile & Click Submit', 'blue');
   
   // Focus OTP field
@@ -84,12 +85,14 @@ function handleOTPPage() {
   if (otpInput) {
     otpInput.focus();
     otpInput.style.border = '2px solid #3498db';
+    console.log('✅ OTP input field focused');
   }
 }
 
 // ============ STEP 3: SELECT USER PAGE ============
 function handleSelectUserPage() {
   console.log('🔄 STEP 3: Auto-submitting user selection...');
+  console.log('🔍 Current URL:', window.location.href);
   showMsg('🔄 STEP 3: Auto-submitting...', 'orange');
   
   setTimeout(() => {
@@ -101,6 +104,7 @@ function handleSelectUserPage() {
       console.log('✅ Submit button found, clicking...');
       submitBtn.click();
     } else {
+      console.log('⚠️ Submit button not found, trying fallback...');
       // Fallback: find any button with Submit text
       document.querySelectorAll('input, button').forEach(btn => {
         if (btn.value === 'Submit' || btn.textContent === 'Submit') {
@@ -116,19 +120,31 @@ function handleSelectUserPage() {
 function handleDashboardPage() {
   console.log('🏠 STEP 4: Dashboard - Looking for LT Name Change...');
   
+  // Debug: Check what's in localStorage
+  console.log('🔍 Checking localStorage...');
+  console.log('dgvcl_name_change_data:', localStorage.getItem('dgvcl_name_change_data'));
+  console.log('dgvcl_autofill_data:', localStorage.getItem('dgvcl_autofill_data'));
+  console.log('All localStorage keys:', Object.keys(localStorage));
+  
   // Check if we have name change data - try both keys
   let storedData = localStorage.getItem('dgvcl_name_change_data') || localStorage.getItem('dgvcl_autofill_data');
   if (!storedData) {
-    showMsg('✅ STEP 4: Dashboard loaded\n👉 Manually click "LT Name Change"', 'green');
+    console.log('❌ No stored data found in localStorage');
+    showMsg('⚠️ STEP 4: No data found\n👉 Manually click "LT Name Change"', 'orange');
     return;
   }
   
+  console.log('📦 Found stored data:', storedData);
   const data = JSON.parse(storedData);
+  console.log('📦 Parsed data:', data);
+  
   if (data.application_type !== 'name_change') {
-    showMsg('✅ STEP 4: Dashboard loaded\n👉 Navigate manually', 'green');
+    console.log('❌ Not name change data, application_type:', data.application_type);
+    showMsg('⚠️ STEP 4: Wrong data type\n👉 Navigate manually', 'orange');
     return;
   }
   
+  console.log('✅ Name change data found, proceeding with automation...');
   showMsg('🤖 STEP 4: Auto-clicking "LT Name Change"...', 'blue');
   
   // Wait 3 seconds then click LT Name Change
@@ -179,6 +195,11 @@ function handleDashboardPage() {
 function handleNameChangeFormPage() {
   console.log('📝 STEP 5: Name Change Form detected');
   
+  // Debug: Check what's in localStorage
+  console.log('🔍 Checking localStorage for form data...');
+  console.log('dgvcl_name_change_data:', localStorage.getItem('dgvcl_name_change_data'));
+  console.log('dgvcl_autofill_data:', localStorage.getItem('dgvcl_autofill_data'));
+  
   // Get stored data - try both keys
   let storedData = localStorage.getItem('dgvcl_name_change_data') || localStorage.getItem('dgvcl_autofill_data');
   if (!storedData) {
@@ -187,12 +208,16 @@ function handleNameChangeFormPage() {
     return;
   }
   
+  console.log('📦 Found stored data:', storedData);
   const data = JSON.parse(storedData);
+  console.log('📦 Parsed data:', data);
+  
   if (data.application_type !== 'name_change') {
-    console.log('❌ Not name change data');
+    console.log('❌ Not name change data, application_type:', data.application_type);
     return;
   }
   
+  console.log('✅ Name change data confirmed, filling form...');
   console.log('📦 Filling Name Change form with:', data);
   showMsg('🤖 STEP 5: Auto-filling Name Change form...', 'blue');
   
