@@ -87,7 +87,7 @@ const Services = () => {
           </div>
           <div>
             <h1 className="text-2xl font-bold text-gray-800">Name Change Services</h1>
-            <p className="text-gray-500 text-sm">गुजरात सरकारी सेवाएं • Apply for name change in your utility connections</p>
+            <p className="text-gray-500 text-sm">भारत सरकारी सेवाएं • Apply for name change in your utility connections</p>
           </div>
         </div>
       </div>

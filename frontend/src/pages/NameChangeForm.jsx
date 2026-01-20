@@ -4,7 +4,6 @@ import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
 import { ArrowLeft, ExternalLink, Zap, Flame, Droplets, Building, CheckCircle } from 'lucide-react';
 import { suppliers, getSuppliers } from '../data/supplierData';
-import RPAController from '../components/SimpleRPAController';
 
 const NameChangeForm = () => {
   const location = useLocation();
@@ -14,12 +13,11 @@ const NameChangeForm = () => {
   // Get category from URL path (e.g., /electricity -> electricity)
   const category = location.pathname.replace('/', '');
   
-  const [step, setStep] = useState(1); // 1: Select Supplier, 2: Fill Form, 3: Choose Method, 4: RPA/Extension, 5: Success
+  const [step, setStep] = useState(1); // 1: Select Supplier, 2: Fill Form, 3: Success
   const [selectedSupplier, setSelectedSupplier] = useState(null);
   const [formData, setFormData] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState('');
-  const [automationMethod, setAutomationMethod] = useState(''); // 'rpa' or 'extension'
 
   const categoryData = suppliers[category];
   const supplierList = getSuppliers(category);
@@ -82,89 +80,12 @@ const NameChangeForm = () => {
 
       await api.post(`/applications/${appResponse.data.id}/submit`);
 
-      // Go to method selection step
-      setStep(3);
-      setMessage(`Application saved! Tracking ID: ${appResponse.data.tracking_id}`);
-      
-    } catch (error) {
-      setMessage('Failed to save application. Please try again.');
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  // Handle automation method selection
-  const handleMethodSelection = (method) => {
-    setAutomationMethod(method);
-    
-    if (method === 'rpa') {
-      // Go to RPA step
-      setStep(4);
-      setMessage('🤖 RPA Automation selected - Complete control from browser');
-    } else {
-      // Extension method
-      handleExtensionMethod();
-    }
-  };
-
-  // Handle extension method
-  const handleExtensionMethod = () => {
-    // Store form data for auto-fill
-    localStorage.setItem('dgvcl_autofill_data', JSON.stringify({
-      application_type: 'name_change',
-      mobile: formData.mobile,
-      consumer_number: formData.consumer_number || formData.service_number,
-      provider: selectedSupplier.name,
-      new_name: formData.new_name,
-      reason: formData.reason,
-      security_deposit_option: formData.security_deposit_option,
-      old_security_deposit: formData.old_security_deposit,
-      applicant_name: formData.applicant_name,
-      email: formData.email,
-      timestamp: Date.now()
-    }));
-
-    // Open DGVCL portal
-    const portalUrl = `https://portal.guvnl.in/login.php?mobile=${formData.mobile}&discom=${selectedSupplier.name}`;
-    window.open(portalUrl, '_blank');
-    
-    setStep(5);
-    setMessage('✅ Extension method - DGVCL portal opened in new tab');
-  };
-
-  // Handle RPA completion
-  const handleRPAComplete = (result) => {
-    setStep(5);
-    setMessage('🎉 RPA automation completed successfully!');
-  };
-
-  // Handle RPA error
-  const handleRPAError = (error) => {
-    setMessage(`❌ RPA automation failed: ${error.message}`);
-  };
-
-      // Store form data for auto-fill with specific key for name change
+      // Store form data for extension auto-fill
       localStorage.setItem('dgvcl_autofill_data', JSON.stringify({
         application_type: 'name_change',
         mobile: formData.mobile,
         consumer_number: formData.consumer_number || formData.service_number,
         provider: selectedSupplier.name,
-        // Name change specific fields
-        new_name: formData.new_name,
-        reason: formData.reason,
-        security_deposit_option: formData.security_deposit_option,
-        old_security_deposit: formData.old_security_deposit,
-        applicant_name: formData.applicant_name,
-        email: formData.email,
-        timestamp: Date.now()
-      }));
-      
-      // Also store with specific name change key to avoid conflicts
-      localStorage.setItem('dgvcl_name_change_data', JSON.stringify({
-        application_type: 'name_change',
-        mobile: formData.mobile,
-        consumer_number: formData.consumer_number || formData.service_number,
-        provider: selectedSupplier.name,
         new_name: formData.new_name,
         reason: formData.reason,
         security_deposit_option: formData.security_deposit_option,
@@ -174,107 +95,13 @@ const NameChangeForm = () => {
         timestamp: Date.now()
       }));
 
-      // Option 1: Extension-based automation (current)
-      const portalUrls = {
-        'dgvcl': 'https://portal.guvnl.in/login.php',
-        'pgvcl': 'https://portal.guvnl.in/login.php',
-        'ugvcl': 'https://portal.guvnl.in/login.php',
-        'mgvcl': 'https://portal.guvnl.in/login.php',
-        'torrent-power': 'https://connect.torrentpower.com',
-        'gujarat-gas': 'https://iconnect.gujaratgas.com/Portal/outer-service-request_template.aspx',
-        'adani-gas': 'https://www.adanigas.com/name-transfer'
-      };
-
-      let portalUrl = portalUrls[selectedSupplier.id] || selectedSupplier.portal_url;
+      // Open DGVCL portal with extension auto-fill
+      const portalUrl = `https://portal.guvnl.in/login.php?mobile=${formData.mobile}&discom=${selectedSupplier.name}`;
+      window.open(portalUrl, '_blank');
       
-      // Add mobile number as URL parameter for GUVNL portals
-      if (portalUrl && portalUrl.includes('portal.guvnl.in') && formData.mobile) {
-        portalUrl += `?mobile=${formData.mobile}&discom=${selectedSupplier.name}`;
-      }
-
-      // Ask user for automation preference
-      const useRPA = window.confirm(
-        '🤖 Choose Automation Method:\n\n' +
-        'OK = RPA Bot (No extension needed, fully automatic)\n' +
-        'Cancel = Browser Extension (Manual captcha/OTP)\n\n' +
-        'RPA Bot will handle everything automatically on server.'
-      );
-
-      if (useRPA) {
-        // Option 2: RPA Bot automation (new)
-        try {
-          setStep(3); // Go to RPA processing step
-          setMessage('🤖 Starting RPA Bot automation...');
-          
-          const rpaResponse = await api.post('/rpa/start', {
-            provider: selectedSupplier.id,
-            application_type: 'name_change',
-            form_data: {
-              mobile: formData.mobile,
-              provider: selectedSupplier.name,
-              new_name: formData.new_name,
-              reason: formData.reason,
-              security_deposit_option: formData.security_deposit_option,
-              old_security_deposit: formData.old_security_deposit,
-              applicant_name: formData.applicant_name,
-              email: formData.email
-            },
-            user_id: user?.id
-          });
-
-          if (rpaResponse.data.success) {
-            // Connect to WebSocket for real-time updates
-            const ws = new WebSocket(`ws://localhost:8000/rpa/ws/${rpaResponse.data.session_id}`);
-            
-            ws.onmessage = (event) => {
-              const status = JSON.parse(event.data);
-              setMessage(`🤖 ${status.step}: ${status.message} (${status.progress}%)`);
-              
-              if (status.status === 'success') {
-                setStep(4);
-                setMessage('🎉 RPA automation completed successfully!');
-              } else if (status.status === 'error') {
-                setMessage(`❌ RPA automation failed: ${status.message}`);
-              }
-            };
-
-            ws.onerror = () => {
-              setMessage('⚠️ RPA connection lost. Check status manually.');
-            };
-          }
-        } catch (error) {
-          setMessage('❌ RPA Bot failed to start. Using extension method...');
-          // Fallback to extension method
-          if (portalUrl) {
-            window.open(portalUrl, '_blank');
-          }
-        }
-      } else {
-        // Option 1: Extension method (existing)
-        if (portalUrl) {
-          const newWindow = window.open(portalUrl, '_blank');
-          
-          // Try to inject auto-fill script (may be blocked by CORS)
-          if (newWindow) {
-            setTimeout(() => {
-              try {
-                newWindow.postMessage({
-                  type: 'AUTOFILL_DATA',
-                  mobile: formData.mobile,
-                  discom: selectedSupplier.name,
-                  consumer_number: formData.consumer_number || formData.service_number
-                }, 'https://portal.guvnl.in');
-              } catch (e) {
-                console.log('Could not send data to portal (CORS)');
-              }
-            }, 1000);
-          }
-        }
-      }
-
-      // Go to success step
-      setStep(4);
-      setMessage(`Application submitted successfully! Tracking ID: ${appResponse.data.tracking_id}`);
+      setStep(3);
+      setMessage(`Application submitted! Tracking ID: ${appResponse.data.tracking_id}`);
+      
     } catch (error) {
       setMessage('Failed to save application. Please try again.');
     } finally {
@@ -431,14 +258,14 @@ const NameChangeForm = () => {
       <div className="bg-white shadow-lg rounded-lg p-8 mx-6">
         {/* Step Indicator */}
         <div className="flex items-center justify-center gap-4 mb-8">
-          {[1, 2, 3, 4, 5].map((s) => (
+          {[1, 2, 3].map((s) => (
             <div key={s} className="flex items-center">
               <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
                 step >= s ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-500'
               }`}>
                 {step > s ? <CheckCircle className="w-5 h-5" /> : s}
               </div>
-              {s < 5 && (
+              {s < 3 && (
                 <div className={`w-12 h-1 mx-1 ${step > s ? 'bg-blue-600' : 'bg-gray-200'}`} />
               )}
             </div>
@@ -618,7 +445,7 @@ const NameChangeForm = () => {
 
                   <div className="bg-green-50 border border-green-200 rounded-lg p-4 mt-6">
                     <p className="text-sm text-green-800">
-                      ✅ <strong>Online Portal Available:</strong> After clicking submit, the official {selectedSupplier.name} portal will open. Your data will be saved for tracking.
+                      ✅ <strong>Extension Auto-Fill:</strong> After clicking submit, the {selectedSupplier.name} portal will open and your Chrome extension will automatically fill the form. You only need to enter Captcha and OTP.
                     </p>
                   </div>
 
@@ -726,167 +553,43 @@ const NameChangeForm = () => {
           </div>
         )}
 
-        {/* Step 3: Choose Automation Method */}
+        {/* Step 3: Success */}
         {step === 3 && (
-          <div>
-            <h2 className="text-xl font-bold text-gray-800 mb-2 text-center">
-              Choose Automation Method
-            </h2>
-            <p className="text-gray-500 text-center mb-6">
-              Select how you want to complete the DGVCL automation
-            </p>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* RPA Bot Option */}
-              <div className="border-2 border-blue-200 rounded-xl p-6 hover:border-blue-400 transition-all cursor-pointer group"
-                   onClick={() => handleMethodSelection('rpa')}>
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-blue-200">
-                    <span className="text-2xl">🤖</span>
-                  </div>
-                  <h3 className="text-lg font-bold text-gray-800 mb-2">RPA Bot Automation</h3>
-                  <p className="text-gray-600 text-sm mb-4">
-                    Complete browser-based automation with real-time monitoring
-                  </p>
-                  
-                  <div className="space-y-2 text-left">
-                    <div className="flex items-center gap-2 text-sm text-green-600">
-                      <CheckCircle className="w-4 h-4" />
-                      <span>No extension required</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-green-600">
-                      <CheckCircle className="w-4 h-4" />
-                      <span>Real-time progress tracking</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-green-600">
-                      <CheckCircle className="w-4 h-4" />
-                      <span>Complete browser control</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-orange-600">
-                      <span className="w-4 h-4 text-center">⚠️</span>
-                      <span>Manual captcha & OTP entry</span>
-                    </div>
-                  </div>
-                  
-                  <button className="w-full mt-4 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors">
-                    Choose RPA Bot
-                  </button>
-                </div>
-              </div>
-
-              {/* Extension Option */}
-              <div className="border-2 border-purple-200 rounded-xl p-6 hover:border-purple-400 transition-all cursor-pointer group"
-                   onClick={() => handleMethodSelection('extension')}>
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-purple-200">
-                    <span className="text-2xl">🧩</span>
-                  </div>
-                  <h3 className="text-lg font-bold text-gray-800 mb-2">Browser Extension</h3>
-                  <p className="text-gray-600 text-sm mb-4">
-                    Traditional extension-based automation in new tab
-                  </p>
-                  
-                  <div className="space-y-2 text-left">
-                    <div className="flex items-center gap-2 text-sm text-green-600">
-                      <CheckCircle className="w-4 h-4" />
-                      <span>Fast and reliable</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-green-600">
-                      <CheckCircle className="w-4 h-4" />
-                      <span>Works on any device</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-orange-600">
-                      <span className="w-4 h-4 text-center">⚠️</span>
-                      <span>Extension installation required</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-orange-600">
-                      <span className="w-4 h-4 text-center">⚠️</span>
-                      <span>Opens in new tab</span>
-                    </div>
-                  </div>
-                  
-                  <button className="w-full mt-4 bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700 transition-colors">
-                    Choose Extension
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-              <p className="text-sm text-blue-800 text-center">
-                <strong>Recommendation:</strong> Choose RPA Bot for the best experience - no extension needed and complete browser control!
-              </p>
-            </div>
-          </div>
-        )}
-
-        {/* Step 4: RPA Automation Controller */}
-        {step === 4 && automationMethod === 'rpa' && (
-          <div>
-            <h2 className="text-xl font-bold text-gray-800 mb-4 text-center">
-              🤖 RPA Automation in Progress
-            </h2>
-            
-            <RPAController 
-              formData={{
-                mobile: formData.mobile,
-                provider: selectedSupplier.name,
-                new_name: formData.new_name,
-                reason: formData.reason,
-                security_deposit_option: formData.security_deposit_option,
-                old_security_deposit: formData.old_security_deposit,
-                applicant_name: formData.applicant_name,
-                email: formData.email
-              }}
-              onComplete={handleRPAComplete}
-              onError={handleRPAError}
-            />
-          </div>
-        )}
-
-        {/* Step 5: Success */}
-        {step === 5 && (
           <div className="text-center py-8">
             <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <CheckCircle className="w-12 h-12 text-green-600" />
             </div>
             <h2 className="text-2xl font-bold text-gray-800 mb-2">
-              Application Saved!
+              Application Submitted!
             </h2>
             <p className="text-gray-600 mb-6">
-              Your application has been saved. The official portal should have opened in a new tab.
+              Your application has been saved and the DGVCL portal has opened in a new tab.
             </p>
 
             <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6 text-left">
               <p className="font-semibold text-blue-800 mb-2">Next Steps:</p>
               <ol className="text-sm text-blue-700 space-y-1 list-decimal list-inside">
-                <li>The demo portal has opened with your data auto-filled</li>
-                <li>Watch the RPA bot fill the form automatically</li>
-                <li>Form will be submitted automatically</li>
-                <li>Track your application status in "My Applications"</li>
+                <li>Login form will be auto-filled with your mobile & DGVCL</li>
+                <li>Enter Captcha and click Login</li>
+                <li>Enter OTP sent to your mobile</li>
+                <li>Navigate to "LT Name Change" section</li>
+                <li>Form will be auto-filled with your details</li>
+                <li>Submit the form to complete the process</li>
               </ol>
             </div>
 
             <div className="flex gap-4 justify-center">
               <button
-                onClick={() => {
-                  const demoSite = selectedSupplier?.id;
-                  const autoFillData = encodeURIComponent(JSON.stringify({
-                    ...formData,
-                    application_type: 'name_change',
-                    city: formData.city || 'Ahmedabad'
-                  }));
-                  window.open(`/demo-govt/${demoSite}?rpa=true&data=${autoFillData}`, '_blank');
-                }}
-                className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
-              >
-                Open Demo Portal Again <ExternalLink className="w-4 h-4" />
-              </button>
-              <button
                 onClick={() => navigate('/applications')}
-                className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+                className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
               >
                 View My Applications
+              </button>
+              <button
+                onClick={() => navigate('/services')}
+                className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+              >
+                Back to Services
               </button>
             </div>
           </div>

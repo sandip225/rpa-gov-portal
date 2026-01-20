@@ -1,4 +1,4 @@
-// All Gujarat Suppliers with their official portal URLs for Name Change
+// All Indian Suppliers with their official portal URLs for Name Change
 export const suppliers = {
   gas: {
     name: 'Gas',

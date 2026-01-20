@@ -231,8 +231,9 @@ const Dashboard = () => {
         </h3>
         <div className="flex flex-wrap gap-2">
           {[
-            { name: 'Digital Gujarat', url: 'https://digitalgujarat.gov.in' },
-            { name: 'AnyRoR Gujarat', url: 'https://anyror.gujarat.gov.in' },
+            { name: 'Digital India', url: 'https://digitalindia.gov.in' },
+            { name: 'India Portal', url: 'https://www.india.gov.in' },
+            { name: 'MyGov', url: 'https://www.mygov.in' },
             { name: 'Torrent Power', url: 'https://connect.torrentpower.com' },
             { name: 'Gujarat Gas', url: 'https://iconnect.gujaratgas.com' },
             { name: 'AMC', url: 'https://ahmedabadcity.gov.in' }

@@ -30,7 +30,7 @@ const WelcomeScreen = ({ onStartFlow }) => {
 
               {/* Title */}
               <h1 className="text-xl md:text-2xl font-bold text-gray-800 mb-2">
-                Gujarat Citizen Services Portal
+                Indian Citizen Services Portal
               </h1>
               <p className="text-base md:text-lg text-orange-600 font-medium mb-1">
                 गुजरात नागरिक सेवा पोर्टल
@@ -86,7 +86,7 @@ const WelcomeScreen = ({ onStartFlow }) => {
 
             {/* Footer Note */}
             <p className="text-center text-[10px] md:text-xs text-gray-400 mt-3 md:mt-4">
-              Powered by Gujarat Government • सुरक्षित और विश्वसनीय
+              Powered by Government of India • सुरक्षित और विश्वसनीय
             </p>
           </div>
         </div>

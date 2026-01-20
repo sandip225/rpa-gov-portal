@@ -36,7 +36,7 @@ const useGuidedFlow = () => {
       chatHistory: [
         {
           type: 'system',
-          content: '🙏 नमस्ते! Welcome to Gujarat Citizen Services Portal. Please select the service you need:',
+          content: '🙏 नमस्ते! Welcome to Indian Citizen Services Portal. Please select the service you need:',
           delay: 0
         }
       ]

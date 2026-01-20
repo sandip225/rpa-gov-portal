@@ -107,7 +107,6 @@ const NewConnectionForm = () => {
         pincode: formData.pincode,
         email: formData.email,
         nearest_consumer_no: formData.nearest_consumer_no,
-        connection_load: formData.connection_load,
         
         timestamp: Date.now(),
         application_type: 'new_connection'

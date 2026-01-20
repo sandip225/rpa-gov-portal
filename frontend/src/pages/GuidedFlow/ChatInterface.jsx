@@ -46,8 +46,8 @@ const ChatInterface = ({
           <span className="text-xl">🤖</span>
         </div>
         <div>
-          <h3 className="font-semibold">Gujarat Citizen Helper</h3>
-          <p className="text-xs text-blue-100">गुजरात नागरिक सहायक • Online</p>
+          <h3 className="font-semibold">Indian Citizen Helper</h3>
+          <p className="text-xs text-blue-100">भारतीय नागरिक सहायक • Online</p>
         </div>
       </div>
 

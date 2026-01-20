@@ -5,6 +5,7 @@ import {
   Menu, X, Bell, ChevronDown, Shield, HelpCircle, MessageCircle
 } from 'lucide-react';
 import { useState } from 'react';
+import AshokStambh from './AshokStambh';
 
 const Layout = () => {
   const { user, logout } = useAuth();
@@ -31,10 +32,10 @@ const Layout = () => {
             <div className="flex items-center gap-4">
               <span className="flex items-center gap-2 text-gray-600">
                 <span className="text-base">🇮🇳</span>
-                <span className="font-medium">Government of Gujarat</span>
+                <span className="font-medium">Government of India</span>
               </span>
               <span className="hidden md:inline text-gray-300">|</span>
-              <span className="hidden md:inline text-gray-600">गुजरात सरकार</span>
+              <span className="hidden md:inline text-gray-600">भारत सरकार</span>
             </div>
             <div className="flex items-center gap-4 text-gray-500">
               <button className="hover:text-primary-600 transition-colors">Skip to Content</button>
@@ -56,8 +57,8 @@ const Layout = () => {
               
               {/* Logo & Title */}
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-primary-500 rounded-lg flex items-center justify-center shadow-md">
-                  <Shield className="w-7 h-7 text-white" />
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-blue-800 rounded-lg flex items-center justify-center shadow-md">
+                  <AshokStambh className="w-8 h-8" color="#ffffff" />
                 </div>
                 <div>
                   <h1 className="text-xl md:text-2xl font-bold text-gray-800">
@@ -197,9 +198,9 @@ const Layout = () => {
       {/* Footer */}
       <footer className="bg-white border-t border-gray-200 py-4">
         <div className="w-full px-6 text-center">
-          <p className="text-sm text-gray-600">© 2024 Unified Services Portal | Government of Gujarat</p>
+          <p className="text-sm text-gray-600">© 2024 Unified Services Portal | Government of India</p>
           <p className="text-xs text-gray-500 mt-1">
-            Designed & Developed for Digital Gujarat Initiative
+            Designed & Developed for Digital India Initiative
           </p>
         </div>
       </footer>

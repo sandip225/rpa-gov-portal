@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../api/axios';
 import { Mail, Lock, User, Phone, MapPin, UserPlus, Shield, Zap, Flame, Droplets, Building } from 'lucide-react';
+import AshokStambh from '../components/AshokStambh';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -15,7 +16,7 @@ const Register = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const gujaratCities = [
+  const indianCities = [
     'Ahmedabad', 'Surat', 'Vadodara', 'Rajkot', 'Bhavnagar',
     'Jamnagar', 'Junagadh', 'Gandhinagar', 'Anand', 'Nadiad',
     'Mehsana', 'Morbi', 'Surendranagar', 'Bharuch', 'Navsari'
@@ -42,14 +43,19 @@ const Register = () => {
       
       {/* Header */}
       <div className="text-center py-8">
+        <div className="flex justify-center mb-4">
+          <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-blue-800 rounded-full flex items-center justify-center shadow-lg">
+            <AshokStambh className="w-10 h-10" color="#ffffff" />
+          </div>
+        </div>
         <div className="flex justify-center gap-3 mb-3">
           <Zap className="w-6 h-6 text-yellow-600" />
           <Flame className="w-6 h-6 text-orange-600" />
           <Droplets className="w-6 h-6 text-blue-600" />
           <Building className="w-6 h-6 text-green-600" />
         </div>
-        <h1 className="text-2xl font-bold text-gray-800">Gujarat Unified Services Portal</h1>
-        <p className="text-gray-600 text-sm mt-1">गुजरात एकीकृत सेवा पोर्टल</p>
+        <h1 className="text-2xl font-bold text-gray-800">Unified Services Portal</h1>
+        <p className="text-gray-600 text-sm mt-1">एकीकृत सेवा पोर्टल</p>
       </div>
 
       {/* Register Card */}
@@ -129,7 +135,7 @@ const Register = () => {
                     required
                   >
                     <option value="">Select your city</option>
-                    {gujaratCities.map(city => (
+                    {indianCities.map(city => (
                       <option key={city} value={city}>{city}</option>
                     ))}
                   </select>
@@ -179,7 +185,7 @@ const Register = () => {
 
           {/* Footer */}
           <div className="text-center mt-6 text-gray-600 text-sm">
-            <p>🇮🇳 Government of Gujarat | सत्यमेव जयते</p>
+            <p>🇮🇳 Government of India | सत्यमेव जयते</p>
           </div>
         </div>
       </div>

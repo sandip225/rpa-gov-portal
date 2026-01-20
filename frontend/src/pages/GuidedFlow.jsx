@@ -178,7 +178,7 @@ const GuidedFlow = () => {
               </div>
               <div>
                 <h2 className="text-lg font-bold flex items-center gap-2">
-                  Gujarat Citizen Helper
+                  Indian Citizen Helper
                   <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full">AI</span>
                 </h2>
                 <p className="text-xs text-blue-100">गुजरात नागरिक सेवा सहायक</p>
@@ -195,7 +195,7 @@ const GuidedFlow = () => {
                   <MessageCircle className="w-8 h-8 text-blue-600" />
                 </div>
                 <h1 className="text-2xl font-bold text-gray-800 mb-2">
-                  Gujarat Citizen Services Portal
+                  Indian Citizen Services Portal
                 </h1>
                 <p className="text-lg text-gray-600 mb-1">
                   एकीकृत नागरिक सेवा पोर्टल
