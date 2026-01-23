@@ -5,7 +5,6 @@ import {
   Menu, X, Bell, ChevronDown, Shield, HelpCircle, MessageCircle
 } from 'lucide-react';
 import { useState } from 'react';
-import AshokStambh from './AshokStambh';
 
 const Layout = () => {
   const { user, logout } = useAuth();
@@ -57,8 +56,8 @@ const Layout = () => {
               
               {/* Logo & Title */}
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-blue-800 rounded-lg flex items-center justify-center shadow-md">
-                  <AshokStambh className="w-8 h-8" color="#ffffff" />
+                <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center shadow-md border border-gray-200">
+                  <img src="/ashoka-emblem.webp" alt="Ashoka Emblem" className="w-10 h-10 object-contain" />
                 </div>
                 <div>
                   <h1 className="text-xl md:text-2xl font-bold text-gray-800">

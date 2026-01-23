@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../api/axios';
 import { Mail, Lock, User, Phone, MapPin, UserPlus, Shield, Zap, Flame, Droplets, Building } from 'lucide-react';
-import AshokStambh from '../components/AshokStambh';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -28,10 +27,14 @@ const Register = () => {
     setLoading(true);
 
     try {
-      await api.post('/auth/register', formData);
-      navigate('/login');
+      const response = await api.post('/auth/register', formData);
+      if (response.status === 200) {
+        navigate('/login');
+      }
     } catch (err) {
-      setError(err.response?.data?.detail || 'Registration failed');
+      const errorMsg = err.response?.data?.detail || err.message || 'Registration failed';
+      console.error('Registration error:', err.response?.data);
+      setError(errorMsg);
     }
     setLoading(false);
   };
@@ -44,8 +47,8 @@ const Register = () => {
       {/* Header */}
       <div className="text-center py-8">
         <div className="flex justify-center mb-4">
-          <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-blue-800 rounded-full flex items-center justify-center shadow-lg">
-            <AshokStambh className="w-10 h-10" color="#ffffff" />
+          <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-lg border-2 border-gray-200">
+            <img src="/ashoka-emblem.webp" alt="Ashoka Emblem" className="w-14 h-14 object-contain" />
           </div>
         </div>
         <div className="flex justify-center gap-3 mb-3">

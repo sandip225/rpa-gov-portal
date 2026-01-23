@@ -14,6 +14,9 @@ COPY . .
 # Build the application
 RUN npm run build
 
+# Copy public folder images to dist root
+RUN cp public/*.{jpg,jpeg,png,gif,svg,webp} dist/ 2>/dev/null || true
+
 # Production stage with Nginx
 FROM nginx:alpine
 
