@@ -186,155 +186,153 @@ class EnhancedDirectAutomationService:
         try:
             logger.info(f"Starting Gujarat Gas name change for consumer: {data.get('consumer_number')}")
             
-            self.setup_driver(headless=False)
+            # Use headless mode for EC2
+            self.setup_driver(headless=True, stealth_mode=True)
             
-            # Navigate to customer care page
-            url = "https://www.gujaratgas.com/customer-care"
+            # Navigate to the correct iConnect portal URL
+            url = "https://iconnect.gujaratgas.com/Portal/outer-service-request_template.aspx"
+            logger.info(f"Navigating to: {url}")
             self.driver.get(url)
             
             # Wait for page load
-            time.sleep(3)
+            time.sleep(5)
             
-            # Look for name change form or contact form
+            # Take initial screenshot
+            initial_screenshot = f"screenshots/gujarat_gas_initial_{int(time.time())}.png"
+            self.driver.save_screenshot(initial_screenshot)
+            logger.info(f"Initial screenshot saved: {initial_screenshot}")
+            
+            # Check if page loaded correctly
+            page_title = self.driver.title
+            current_url = self.driver.current_url
+            logger.info(f"Page loaded - Title: {page_title}, URL: {current_url}")
+            
+            # Try to find and fill form fields with multiple selector strategies
+            form_filled = False
+            
             try:
-                # Try to find consumer number field
-                consumer_field = self.wait.until(EC.element_to_be_clickable((By.NAME, "consumer_no")))
-                consumer_field.clear()
-                consumer_field.send_keys(data.get('consumer_number', ''))
-                time.sleep(0.5)
-            except:
-                # Alternative selector
-                try:
-                    consumer_field = self.driver.find_element(By.XPATH, "//input[contains(@placeholder, 'consumer') or contains(@placeholder, 'Consumer')]")
-                    consumer_field.clear()
-                    consumer_field.send_keys(data.get('consumer_number', ''))
-                    time.sleep(0.5)
-                except:
-                    logger.warning("Consumer number field not found")
+                # Look for consumer number field with multiple selectors
+                consumer_selectors = [
+                    "input[name='txtConsumerNo']",
+                    "input[name='consumer_no']",
+                    "input[name='consumerNumber']",
+                    "input[id*='consumer']",
+                    "input[placeholder*='consumer']",
+                    "input[placeholder*='Consumer']"
+                ]
+                
+                consumer_field = self.smart_element_finder(consumer_selectors, timeout=10)
+                if consumer_field:
+                    self.human_like_typing(consumer_field, data.get('consumer_number', ''))
+                    logger.info("✅ Consumer number filled")
+                    form_filled = True
+                else:
+                    logger.warning("❌ Consumer number field not found")
+                
+                # Fill current name
+                current_name_selectors = [
+                    "input[name='txtCurrentName']",
+                    "input[name='current_name']",
+                    "input[name='oldName']",
+                    "input[id*='current']",
+                    "input[placeholder*='current']"
+                ]
+                
+                current_name_field = self.smart_element_finder(current_name_selectors, timeout=5)
+                if current_name_field:
+                    self.human_like_typing(current_name_field, data.get('old_name', ''))
+                    logger.info("✅ Current name filled")
+                    form_filled = True
+                
+                # Fill new name
+                new_name_selectors = [
+                    "input[name='txtNewName']",
+                    "input[name='new_name']",
+                    "input[name='newName']",
+                    "input[id*='new']",
+                    "input[placeholder*='new']"
+                ]
+                
+                new_name_field = self.smart_element_finder(new_name_selectors, timeout=5)
+                if new_name_field:
+                    self.human_like_typing(new_name_field, data.get('new_name', ''))
+                    logger.info("✅ New name filled")
+                    form_filled = True
+                
+                # Fill mobile
+                mobile_selectors = [
+                    "input[name='txtMobile']",
+                    "input[name='mobile']",
+                    "input[type='tel']",
+                    "input[id*='mobile']",
+                    "input[placeholder*='mobile']"
+                ]
+                
+                mobile_field = self.smart_element_finder(mobile_selectors, timeout=5)
+                if mobile_field:
+                    self.human_like_typing(mobile_field, data.get('mobile', ''))
+                    logger.info("✅ Mobile filled")
+                    form_filled = True
+                
+                # Fill email if provided
+                if data.get('email'):
+                    email_selectors = [
+                        "input[name='txtEmail']",
+                        "input[name='email']",
+                        "input[type='email']",
+                        "input[id*='email']"
+                    ]
+                    
+                    email_field = self.smart_element_finder(email_selectors, timeout=5)
+                    if email_field:
+                        self.human_like_typing(email_field, data['email'])
+                        logger.info("✅ Email filled")
+                        form_filled = True
+                
+                # Fill address
+                address_selectors = [
+                    "textarea[name='txtAddress']",
+                    "textarea[name='address']",
+                    "input[name='address']",
+                    "textarea[id*='address']"
+                ]
+                
+                address_field = self.smart_element_finder(address_selectors, timeout=5)
+                if address_field:
+                    self.human_like_typing(address_field, data.get('address', ''))
+                    logger.info("✅ Address filled")
+                    form_filled = True
+                
+            except Exception as field_error:
+                logger.warning(f"Form filling error: {field_error}")
             
-            # Fill current name
-            try:
-                current_name_field = self.driver.find_element(By.NAME, "current_name")
-                current_name_field.clear()
-                current_name_field.send_keys(data.get('old_name', ''))
-                time.sleep(0.5)
-            except:
-                try:
-                    current_name_field = self.driver.find_element(By.XPATH, "//input[contains(@placeholder, 'current name') or contains(@placeholder, 'existing name')]")
-                    current_name_field.clear()
-                    current_name_field.send_keys(data.get('old_name', ''))
-                    time.sleep(0.5)
-                except:
-                    logger.warning("Current name field not found")
+            # Take final screenshot
+            final_screenshot = f"screenshots/gujarat_gas_filled_{int(time.time())}.png"
+            self.driver.save_screenshot(final_screenshot)
+            logger.info(f"Final screenshot saved: {final_screenshot}")
             
-            # Fill new name
-            try:
-                new_name_field = self.driver.find_element(By.NAME, "new_name")
-                new_name_field.clear()
-                new_name_field.send_keys(data.get('new_name', ''))
-                time.sleep(0.5)
-            except:
-                try:
-                    new_name_field = self.driver.find_element(By.XPATH, "//input[contains(@placeholder, 'new name')]")
-                    new_name_field.clear()
-                    new_name_field.send_keys(data.get('new_name', ''))
-                    time.sleep(0.5)
-                except:
-                    logger.warning("New name field not found")
-            
-            # Fill mobile
-            try:
-                mobile_field = self.driver.find_element(By.NAME, "mobile")
-                mobile_field.clear()
-                mobile_field.send_keys(data.get('mobile', ''))
-                time.sleep(0.5)
-            except:
-                try:
-                    mobile_field = self.driver.find_element(By.XPATH, "//input[@type='tel' or contains(@placeholder, 'mobile') or contains(@placeholder, 'phone')]")
-                    mobile_field.clear()
-                    mobile_field.send_keys(data.get('mobile', ''))
-                    time.sleep(0.5)
-                except:
-                    logger.warning("Mobile field not found")
-            
-            # Fill email
-            if data.get('email'):
-                try:
-                    email_field = self.driver.find_element(By.NAME, "email")
-                    email_field.clear()
-                    email_field.send_keys(data['email'])
-                    time.sleep(0.5)
-                except:
-                    try:
-                        email_field = self.driver.find_element(By.XPATH, "//input[@type='email']")
-                        email_field.clear()
-                        email_field.send_keys(data['email'])
-                        time.sleep(0.5)
-                    except:
-                        logger.warning("Email field not found")
-            
-            # Fill address
-            try:
-                address_field = self.driver.find_element(By.NAME, "address")
-                address_field.clear()
-                address_field.send_keys(data.get('address', ''))
-                time.sleep(0.5)
-            except:
-                try:
-                    address_field = self.driver.find_element(By.TAG_NAME, "textarea")
-                    address_field.clear()
-                    address_field.send_keys(data.get('address', ''))
-                    time.sleep(0.5)
-                except:
-                    logger.warning("Address field not found")
-            
-            # Select reason if dropdown exists
-            if data.get('reason'):
-                try:
-                    reason_select = Select(self.driver.find_element(By.NAME, "reason"))
-                    reason_select.select_by_value(data['reason'])
-                    time.sleep(0.5)
-                except:
-                    logger.warning("Reason dropdown not found")
-            
-            # Take screenshot before submit
-            screenshot_path = f"screenshots/gujarat_gas_filled_{int(time.time())}.png"
-            self.driver.save_screenshot(screenshot_path)
-            
-            # Show completion message
-            completion_script = """
-            alert(`✅ Gujarat Gas Form Filled Successfully!
-            
-Please review the filled information:
-• Consumer Number: Filled
-• Current Name: Filled  
-• New Name: Filled
-• Mobile: Filled
-• Email: Filled (if provided)
-• Address: Filled
-
-Next Steps:
-1. Review all information carefully
-2. Submit the form manually
-3. Save any confirmation number received
-4. Keep screenshot for records
-
-Click OK to continue.`);
-            """
-            self.driver.execute_script(completion_script)
+            if form_filled:
+                success_message = "Gujarat Gas form accessed and partially filled. Manual review and submission required."
+                logger.info("✅ " + success_message)
+            else:
+                success_message = "Gujarat Gas website accessed but form fields not found. Manual form filling required."
+                logger.warning("⚠️ " + success_message)
             
             return {
                 "success": True,
-                "message": "Gujarat Gas form filled successfully. Please review and submit manually.",
-                "screenshot_path": screenshot_path,
+                "message": success_message,
+                "screenshot_path": final_screenshot,
                 "website": "Gujarat Gas",
                 "service": "Name Change",
+                "form_filled": form_filled,
+                "page_title": page_title,
+                "current_url": current_url,
                 "filled_data": data,
                 "next_steps": [
-                    "Review all filled information",
-                    "Submit form manually after verification",
-                    "Save confirmation number",
-                    "Keep screenshot for records"
+                    "Review the website in the screenshot",
+                    "Manually fill any missing fields",
+                    "Submit the form after verification",
+                    "Save confirmation number"
                 ]
             }
             
@@ -342,22 +340,33 @@ Click OK to continue.`);
             logger.error(f"Gujarat Gas automation failed: {str(e)}")
             
             # Take error screenshot
+            error_screenshot = None
             try:
                 error_screenshot = f"screenshots/gujarat_gas_error_{int(time.time())}.png"
-                self.driver.save_screenshot(error_screenshot)
+                if self.driver:
+                    self.driver.save_screenshot(error_screenshot)
             except:
-                error_screenshot = None
+                pass
             
             return {
                 "success": False,
                 "error": str(e),
-                "message": "Gujarat Gas automation failed. Please try manual form filling.",
+                "message": f"Gujarat Gas automation failed: {str(e)}",
                 "screenshot_path": error_screenshot,
-                "website": "Gujarat Gas"
+                "website": "Gujarat Gas",
+                "service": "Name Change"
             }
         finally:
-            # Keep browser open for manual verification
-            pass
+            # Keep browser open for manual verification in non-headless mode
+            # In headless mode, close the driver
+            if self.driver:
+                try:
+                    if self.driver.execute_script("return navigator.webdriver") is None:
+                        # Headless mode - close driver
+                        self.close_driver()
+                except:
+                    # Close driver on any error
+                    self.close_driver()
     
     def submit_vadodara_gas_name_change(self, data: Dict[str, Any]) -> Dict[str, Any]:
         """Vadodara Gas - Direct name change form (No login required)"""
@@ -523,50 +532,123 @@ Click OK to continue.`);
         try:
             logger.info(f"Starting AnyROR name change for property: {data.get('property_id')}")
             
-            self.setup_driver(headless=False)
+            self.setup_driver(headless=True, stealth_mode=True)
             
             # Direct URL to public records
             url = "https://anyror.gujarat.gov.in"
+            logger.info(f"Navigating to: {url}")
             self.driver.get(url)
             
             # Wait for page load
-            self.wait.until(EC.presence_of_element_located((By.ID, "district")))
+            time.sleep(5)
             
-            # Select district if provided
-            if data.get('district'):
-                district_select = Select(self.driver.find_element(By.ID, "district"))
-                district_select.select_by_visible_text(data['district'])
-                time.sleep(1)
+            # Take initial screenshot
+            initial_screenshot = f"screenshots/anyror_initial_{int(time.time())}.png"
+            self.driver.save_screenshot(initial_screenshot)
             
-            # Fill survey number
-            if data.get('survey_number'):
-                survey_field = self.driver.find_element(By.ID, "survey_no")
-                survey_field.send_keys(data['survey_number'])
-                time.sleep(0.5)
+            page_title = self.driver.title
+            current_url = self.driver.current_url
+            logger.info(f"AnyROR loaded - Title: {page_title}, URL: {current_url}")
             
-            # Click search to view record
-            search_btn = self.driver.find_element(By.ID, "search_btn")
-            search_btn.click()
+            form_filled = False
             
-            # Wait for results
-            time.sleep(3)
+            try:
+                # Look for district dropdown
+                district_selectors = [
+                    "select[id='district']",
+                    "select[name='district']",
+                    "select[id*='district']"
+                ]
+                
+                district_field = self.smart_element_finder(district_selectors, timeout=10)
+                if district_field and data.get('district'):
+                    from selenium.webdriver.support.ui import Select
+                    district_select = Select(district_field)
+                    district_select.select_by_visible_text(data['district'])
+                    logger.info("✅ District selected")
+                    form_filled = True
+                    time.sleep(1)
+                
+                # Fill survey number
+                survey_selectors = [
+                    "input[id='survey_no']",
+                    "input[name='survey_no']",
+                    "input[name='surveyNumber']",
+                    "input[id*='survey']"
+                ]
+                
+                survey_field = self.smart_element_finder(survey_selectors, timeout=5)
+                if survey_field and data.get('survey_number'):
+                    self.human_like_typing(survey_field, data['survey_number'])
+                    logger.info("✅ Survey number filled")
+                    form_filled = True
+                
+                # Look for search button
+                search_selectors = [
+                    "button[id='search_btn']",
+                    "input[type='submit']",
+                    "button[type='submit']",
+                    "button[id*='search']"
+                ]
+                
+                search_btn = self.smart_element_finder(search_selectors, timeout=5)
+                if search_btn:
+                    self.smart_click(search_btn)
+                    logger.info("✅ Search button clicked")
+                    time.sleep(3)
+                    form_filled = True
+                
+            except Exception as field_error:
+                logger.warning(f"AnyROR form filling error: {field_error}")
             
-            screenshot_path = f"screenshots/anyror_{int(time.time())}.png"
-            self.driver.save_screenshot(screenshot_path)
+            # Take final screenshot
+            final_screenshot = f"screenshots/anyror_{int(time.time())}.png"
+            self.driver.save_screenshot(final_screenshot)
+            
+            if form_filled:
+                success_message = "AnyROR record search completed. Manual mutation process required for name change."
+            else:
+                success_message = "AnyROR website accessed but form fields not found. Manual search required."
             
             return {
                 "success": True,
-                "message": "AnyROR record accessed. Manual mutation process required.",
-                "screenshot_path": screenshot_path,
+                "message": success_message,
+                "screenshot_path": final_screenshot,
                 "website": "AnyROR",
-                "note": "Record viewed. For name change, visit e-Dhara center or Talati office."
+                "service": "Property Record Search",
+                "form_filled": form_filled,
+                "page_title": page_title,
+                "current_url": current_url,
+                "note": "For name change, visit e-Dhara center or Talati office with required documents.",
+                "next_steps": [
+                    "Review the property record in screenshot",
+                    "Visit e-Dhara center or Talati office for name change",
+                    "Carry required documents (sale deed, identity proof, etc.)",
+                    "Complete mutation process manually"
+                ]
             }
             
         except Exception as e:
             logger.error(f"AnyROR automation failed: {str(e)}")
-            return {"success": False, "error": str(e)}
+            
+            error_screenshot = None
+            try:
+                error_screenshot = f"screenshots/anyror_error_{int(time.time())}.png"
+                if self.driver:
+                    self.driver.save_screenshot(error_screenshot)
+            except:
+                pass
+            
+            return {
+                "success": False,
+                "error": str(e),
+                "message": f"AnyROR automation failed: {str(e)}",
+                "screenshot_path": error_screenshot,
+                "website": "AnyROR"
+            }
         finally:
-            pass
+            if self.driver:
+                self.close_driver()
 
 # Global enhanced service instance
 direct_automation_service = EnhancedDirectAutomationService()
