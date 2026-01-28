@@ -84,11 +84,11 @@ export const suppliers = {
         type: 'Private',
         areas: 'Ahmedabad, Gandhinagar, Surat',
         portal: 'https://www.torrentpower.com',
-        nameChangeUrl: 'https://connect.torrentpower.com',
+        nameChangeUrl: 'https://connect.torrentpower.com/tplcp/application/namechangerequest',
         offlineForm: 'https://www.torrentpower.com/public/pdf/investors/AHDAHDNameChangeLTENGForm2407191_20211129182958.pdf',
-        hasOnlinePortal: false,
-        offlineNote: 'Online name change form not available - Download offline form PDF and submit at Torrent Power office',
-        fields: ['city', 'service_number', 't_no', 'applicant_name', 'mobile', 'email']
+        hasOnlinePortal: true,
+        offlineNote: 'RPA automation available - Direct form filling on official website',
+        fields: ['city', 'service_number', 'applicant_name', 'new_name', 'mobile', 'email', 'password']
       },
       {
         id: 'pgvcl',

@@ -14,6 +14,7 @@ import os
 from datetime import datetime
 
 from .user_data_service import user_data_service
+from .selenium_config import selenium_config
 from .torrent_power_service import torrent_power_service
 
 logger = logging.getLogger(__name__)
@@ -27,8 +28,8 @@ class EnhancedDirectAutomationService:
         self.actions = None
         self.current_user_key = None
         
-    def setup_driver(self, headless: bool = False, stealth_mode: bool = True, 
-                    undetected: bool = False) -> webdriver.Chrome:
+    def setup_driver(self, headless: bool = True, stealth_mode: bool = True, 
+                    undetected: bool = False) -> any:
         """Setup Chrome WebDriver with advanced configuration"""
         try:
             # Create driver using selenium_config
@@ -43,6 +44,7 @@ class EnhancedDirectAutomationService:
             
             # Setup WebDriverWait and ActionChains
             self.wait = WebDriverWait(self.driver, 30)
+            from selenium.webdriver.common.action_chains import ActionChains
             self.actions = ActionChains(self.driver)
             
             logger.info("Enhanced WebDriver setup completed")
@@ -175,7 +177,7 @@ class EnhancedDirectAutomationService:
     def close_driver(self):
         """Close the WebDriver"""
         if self.driver:
-            self.driver.quit()
+            selenium_config.cleanup_driver(self.driver)
             self.driver = None
             self.wait = None
 
