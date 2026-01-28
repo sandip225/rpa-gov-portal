@@ -15,9 +15,24 @@ router = APIRouter(prefix="/api/services", tags=["services-data"])
 def load_services_data() -> Dict[str, Any]:
     """Load services data from JSON file"""
     try:
-        services_file = os.path.join(os.path.dirname(__file__), "../data/services_data.json")
-        with open(services_file, 'r', encoding='utf-8') as f:
-            return json.load(f)
+        # Try multiple possible paths
+        possible_paths = [
+            os.path.join(os.path.dirname(__file__), "../data/services_data.json"),
+            "/app/app/data/services_data.json",
+            "/app/data/services_data.json",
+            "backend/app/data/services_data.json"
+        ]
+        
+        for services_file in possible_paths:
+            if os.path.exists(services_file):
+                with open(services_file, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                logger.info(f"Services data loaded from: {services_file}")
+                return data
+        
+        logger.error("Services data file not found in any expected location")
+        return {}
+        
     except Exception as e:
         logger.error(f"Error loading services data: {e}")
         return {}
