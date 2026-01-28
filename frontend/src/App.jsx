@@ -10,7 +10,7 @@ import Services from './pages/Services';
 import Applications from './pages/Applications';
 import GuidedFlow from './pages/GuidedFlow';
 import NameChangeForm from './pages/NameChangeForm';
-import NewConnectionForm from './pages/NewConnectionForm';
+import TorrentPowerRPA from './pages/TorrentPowerRPA';
 import OfflineIndicator from './components/OfflineIndicator';
 import InstallPWA from './components/InstallPWA';
 import './registerSW';
@@ -61,6 +61,7 @@ function App() {
             <Route path="water" element={<NameChangeForm />} />
             <Route path="property" element={<NameChangeForm />} />
             <Route path="new-connection" element={<NewConnectionForm />} />
+            <Route path="torrent-power-rpa" element={<TorrentPowerRPA />} />
           </Route>
         </Routes>
       </BrowserRouter>

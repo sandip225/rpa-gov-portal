@@ -99,6 +99,51 @@ const Services = () => {
         </p>
       </div>
 
+      {/* RPA Automation Section */}
+      <div className="bg-gradient-to-r from-orange-50 to-red-50 rounded-lg p-6 border border-orange-200">
+        <div className="flex items-center gap-4 mb-4">
+          <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg flex items-center justify-center">
+            <Zap className="w-6 h-6 text-white" />
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-gray-800">🤖 RPA Automation</h2>
+            <p className="text-gray-600 text-sm">Automated form filling for supported providers</p>
+          </div>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Link
+            to="/torrent-power-rpa"
+            className="bg-white rounded-lg p-4 border border-orange-200 hover:border-orange-300 hover:shadow-md transition-all group"
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="font-semibold text-gray-800 group-hover:text-orange-600">Torrent Power RPA</h3>
+                <p className="text-sm text-gray-600 mt-1">Complete automation for name change</p>
+                <div className="flex items-center gap-2 mt-2">
+                  <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">Auto Login</span>
+                  <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">Auto Fill</span>
+                </div>
+              </div>
+              <ArrowRight className="w-5 h-5 text-orange-500 group-hover:translate-x-1 transition-transform" />
+            </div>
+          </Link>
+          
+          <div className="bg-white rounded-lg p-4 border border-gray-200 opacity-60">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="font-semibold text-gray-600">More RPA Services</h3>
+                <p className="text-sm text-gray-500 mt-1">Coming soon...</p>
+                <div className="flex items-center gap-2 mt-2">
+                  <span className="text-xs bg-gray-100 text-gray-500 px-2 py-1 rounded-full">In Development</span>
+                </div>
+              </div>
+              <div className="w-5 h-5 text-gray-400">⏳</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Services Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {services.map((service) => {
