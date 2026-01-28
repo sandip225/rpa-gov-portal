@@ -14,7 +14,6 @@ services:
       - ACCESS_TOKEN_EXPIRE_MINUTES=30
     volumes:
       - ./backend:/app
-      - ./rpa-automation:/app/rpa-automation
       - backend-data:/app/data
     networks:
       - unified-portal-network

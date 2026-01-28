@@ -94,3 +94,18 @@ terraform/terraform.tfstate
 terraform/terraform.tfstate.backup
 terraform/*.tfvars
 terraform/gov-portal.pem
+
+# Sensitive files
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+
+# Cache directories
+.qodo/
+.cache/
+
+# Test files
+test-*.py
+*-test.py
