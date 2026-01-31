@@ -1,26 +1,8 @@
 import axios from 'axios';
 
-// Dynamically determine API base URL based on current protocol
-const getApiBaseUrl = () => {
-  if (typeof window !== 'undefined') {
-    const protocol = window.location.protocol;
-    const hostname = window.location.hostname;
-    const port = window.location.port;
-    
-    // If accessing via HTTPS, use HTTPS API
-    if (protocol === 'https:') {
-      return `https://${hostname}/api`;
-    }
-    // If accessing via HTTP, use HTTP API
-    return `http://${hostname}/api`;
-  }
-  
-  // Fallback for server-side rendering
-  return import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
-};
-
+// Force use direct backend port for EC2 deployment
 const api = axios.create({
-  baseURL: getApiBaseUrl(),
+  baseURL: 'http://50.19.189.29:8000/api',
   headers: {
     'Content-Type': 'application/json',
   },
