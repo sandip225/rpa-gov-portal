@@ -1,6 +1,9 @@
 # Exclude guided-flow-whatsapp folder
 guided-flow-whatsapp/
 
+# Exclude browser-use folder (embedded git repo)
+browser-use/
+
 # Node modules
 node_modules/
 */node_modules/
@@ -114,3 +117,6 @@ Thumbs.db
 
 # Screenshots
 screenshots/
+
+# Deployment packages
+deployment-package/

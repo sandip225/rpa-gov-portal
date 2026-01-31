@@ -3,8 +3,9 @@ import { useParams, useSearchParams, Link } from 'react-router-dom';
 import { 
   Zap, Flame, Droplets, Building, ArrowLeft, Upload, 
   User, Phone, Mail, MapPin, FileText, Calendar,
-  AlertCircle, CheckCircle, Info
+  AlertCircle, CheckCircle, Info, Bot, Sparkles
 } from 'lucide-react';
+import AIAutomationIframe from '../components/AIAutomationIframe';
 
 const NameChangeApplication = () => {
   const { serviceType } = useParams();
@@ -12,46 +13,44 @@ const NameChangeApplication = () => {
   const providerId = searchParams.get('provider');
   
   const [formData, setFormData] = useState({
-    // Personal Information
+    // Torrent Power Specific Fields (only for torrent-power)
+    city: 'Ahmedabad',
+    serviceNumber: '',
+    tNumber: '',
+    mobile: '',
+    email: '',
+    confirmEmail: '',
+    
+    // Original fields for other providers
     currentName: '',
     newName: '',
     fatherName: '',
     motherName: '',
     dateOfBirth: '',
     gender: '',
-    mobile: '',
-    email: '',
     address: '',
     pincode: '',
-    
-    // Connection Details
     connectionNumber: '',
     connectionType: '',
     registeredAddress: '',
-    
-    // Documents
     identityProof: null,
     addressProof: null,
     nameChangeProof: null,
     connectionBill: null,
-    
-    // Provider Specific Fields
     applicationNumber: '',
     subdivisionCode: '',
     consumerCategory: '',
     loadSanctioned: '',
-    
-    // Government Specific
     aadhaarNumber: '',
     rationCardNumber: '',
-    
-    // Private Specific
     customerID: '',
     accountNumber: ''
   });
 
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+  const [showAIAutomation, setShowAIAutomation] = useState(false);
+  const [automationResult, setAutomationResult] = useState(null);
 
   const serviceConfig = {
     electricity: {
@@ -132,11 +131,13 @@ const NameChangeApplication = () => {
       nameHindi: 'टॉरेंट पावर',
       type: 'Private',
       service: 'electricity',
-      requiredFields: ['currentName', 'newName', 'customerID', 'mobile', 'email'],
-      specificFields: ['accountNumber', 'connectionType'],
-      documents: ['identityProof', 'addressProof', 'nameChangeProof', 'connectionBill'],
+      requiredFields: ['serviceNumber', 'tNumber', 'mobile', 'email', 'confirmEmail'],
+      specificFields: ['city'],
+      documents: [], // No documents required for online application
       processingTime: '5-10 days',
-      fees: 'Rs. 100 + taxes'
+      fees: 'Rs. 100 + taxes',
+      aiSupported: true,
+      portalUrl: 'https://connect.torrentpower.com/tplcp/application/namechangerequest'
     },
     
     // Gas Providers
@@ -225,17 +226,34 @@ const NameChangeApplication = () => {
   const validateForm = () => {
     const newErrors = {};
     
-    provider.requiredFields.forEach(field => {
-      if (!formData[field]) {
-        newErrors[field] = 'This field is required';
-      }
-    });
+    if (providerId === 'torrent-power') {
+      // Torrent Power specific validation
+      const requiredFields = ['serviceNumber', 'tNumber', 'mobile', 'email', 'confirmEmail'];
+      
+      requiredFields.forEach(field => {
+        if (!formData[field]) {
+          newErrors[field] = 'This field is required';
+        }
+      });
 
-    provider.documents.forEach(doc => {
-      if (!formData[doc]) {
-        newErrors[doc] = 'This document is required';
+      // Email confirmation validation
+      if (formData.email && formData.confirmEmail && formData.email !== formData.confirmEmail) {
+        newErrors.confirmEmail = 'Email addresses do not match';
       }
-    });
+    } else {
+      // Original validation for other providers
+      provider.requiredFields.forEach(field => {
+        if (!formData[field]) {
+          newErrors[field] = 'This field is required';
+        }
+      });
+
+      provider.documents.forEach(doc => {
+        if (!formData[doc]) {
+          newErrors[doc] = 'This document is required';
+        }
+      });
+    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -248,6 +266,13 @@ const NameChangeApplication = () => {
       return;
     }
 
+    // Check if AI automation is supported for this provider
+    if (provider.aiSupported) {
+      setShowAIAutomation(true);
+      return;
+    }
+
+    // Fallback to traditional submission
     setLoading(true);
     
     try {
@@ -263,6 +288,47 @@ const NameChangeApplication = () => {
       alert('Error submitting application. Please try again.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleAIAutomationComplete = (result) => {
+    setAutomationResult(result);
+    console.log('Browser-use AI Automation completed:', result);
+    
+    // Show success message
+    if (result.success) {
+      alert(`✅ AI Automation Completed!\n\n${result.message}\n\nNext Steps:\n${result.next_steps?.join('\n') || 'Complete the form manually in the browser window.'}`);
+    } else {
+      alert(`❌ AI Automation Failed!\n\n${result.error || result.message}`);
+    }
+  };
+
+  const handleCloseAIAutomation = () => {
+    setShowAIAutomation(false);
+  };
+
+  const prepareUserDataForAI = () => {
+    if (providerId === 'torrent-power') {
+      // Torrent Power specific data
+      return {
+        city: formData.city,
+        service_number: formData.serviceNumber,
+        t_number: formData.tNumber,
+        mobile: formData.mobile,
+        email: formData.email,
+        confirm_email: formData.confirmEmail
+      };
+    } else {
+      // Original data for other providers
+      return {
+        connection_id: formData.connectionNumber || formData.customerID,
+        current_name: formData.currentName,
+        new_name: formData.newName,
+        mobile: formData.mobile,
+        email: formData.email,
+        address: formData.address,
+        reason: 'Name correction as per documents'
+      };
     }
   };
 
@@ -379,111 +445,159 @@ const NameChangeApplication = () => {
       <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-sm p-8 border border-gray-200">
         <h2 className="text-2xl font-bold text-gray-800 mb-8">Application Form</h2>
 
-        {/* Personal Information */}
-        <div className="mb-8">
-          <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-            <User className="w-5 h-5" />
-            Personal Information
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {renderField('currentName', 'Current Name (as per connection)')}
-            {renderField('newName', 'New Name (as per documents)')}
-            {renderField('fatherName', "Father's Name")}
-            {renderField('motherName', "Mother's Name")}
-            {renderField('dateOfBirth', 'Date of Birth', 'date')}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Gender <span className="text-red-500">*</span>
-              </label>
-              <select
-                name="gender"
-                value={formData.gender}
-                onChange={handleInputChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none"
-              >
-                <option value="">Select Gender</option>
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-                <option value="other">Other</option>
-              </select>
+        {/* Torrent Power Specific Fields - Only for Torrent Power */}
+        {providerId === 'torrent-power' ? (
+          <div className="mb-8">
+            <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+              <FileText className="w-5 h-5" />
+              Torrent Power Application Details
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              
+              {/* City Selection */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  City <span className="text-red-500">*</span>
+                </label>
+                <select
+                  name="city"
+                  value={formData.city || 'Ahmedabad'}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none"
+                >
+                  <option value="Ahmedabad">Ahmedabad</option>
+                  <option value="Surat">Surat</option>
+                  <option value="Gandhinagar">Gandhinagar</option>
+                  <option value="Bhavnagar">Bhavnagar</option>
+                </select>
+              </div>
+
+              {/* Service Number */}
+              {renderField('serviceNumber', 'Service Number', 'text', true)}
+              
+              {/* T No (Transaction/Token Number) */}
+              {renderField('tNumber', 'T No (Transaction Number)', 'text', true)}
+              
+              {/* Mobile Number */}
+              {renderField('mobile', 'Mobile Number', 'tel', true)}
+              
+              {/* Email */}
+              {renderField('email', 'Email Address', 'email', true)}
+              
+              {/* Confirm Email */}
+              {renderField('confirmEmail', 'Confirm Email Address', 'email', true)}
             </div>
           </div>
-        </div>
+        ) : (
+          // Original form for all other providers
+          <>
+            {/* Personal Information */}
+            <div className="mb-8">
+              <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                <User className="w-5 h-5" />
+                Personal Information
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {renderField('currentName', 'Current Name (as per connection)')}
+                {renderField('newName', 'New Name (as per documents)')}
+                {renderField('fatherName', "Father's Name")}
+                {renderField('motherName', "Mother's Name")}
+                {renderField('dateOfBirth', 'Date of Birth', 'date')}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Gender <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    name="gender"
+                    value={formData.gender}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none"
+                  >
+                    <option value="">Select Gender</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+              </div>
+            </div>
 
-        {/* Contact Information */}
-        <div className="mb-8">
-          <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-            <Phone className="w-5 h-5" />
-            Contact Information
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {renderField('mobile', 'Mobile Number', 'tel')}
-            {renderField('email', 'Email Address', 'email')}
-            {renderField('address', 'Current Address')}
-            {renderField('pincode', 'PIN Code')}
-          </div>
-        </div>
+            {/* Contact Information */}
+            <div className="mb-8">
+              <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                <Phone className="w-5 h-5" />
+                Contact Information
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {renderField('mobile', 'Mobile Number', 'tel')}
+                {renderField('email', 'Email Address', 'email')}
+                {renderField('address', 'Current Address')}
+                {renderField('pincode', 'PIN Code')}
+              </div>
+            </div>
 
-        {/* Connection Details */}
-        <div className="mb-8">
-          <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-            <FileText className="w-5 h-5" />
-            Connection Details
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {renderField('connectionNumber', 'Connection/Consumer Number')}
-            {renderField('registeredAddress', 'Registered Address')}
-            
-            {/* Provider Specific Fields */}
-            {provider.type === 'Government' && (
-              <>
-                {renderField('aadhaarNumber', 'Aadhaar Number')}
-                {renderField('rationCardNumber', 'Ration Card Number')}
-              </>
-            )}
-            
-            {provider.type === 'Private' && (
-              <>
-                {renderField('customerID', 'Customer ID')}
-                {renderField('accountNumber', 'Account Number')}
-              </>
-            )}
+            {/* Connection Details */}
+            <div className="mb-8">
+              <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                <FileText className="w-5 h-5" />
+                Connection Details
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {renderField('connectionNumber', 'Connection/Consumer Number')}
+                {renderField('registeredAddress', 'Registered Address')}
+                
+                {/* Provider Specific Fields */}
+                {provider.type === 'Government' && (
+                  <>
+                    {renderField('aadhaarNumber', 'Aadhaar Number')}
+                    {renderField('rationCardNumber', 'Ration Card Number')}
+                  </>
+                )}
+                
+                {provider.type === 'Private' && provider.name !== 'Torrent Power' && (
+                  <>
+                    {renderField('customerID', 'Customer ID')}
+                    {renderField('accountNumber', 'Account Number')}
+                  </>
+                )}
 
-            {/* Service Specific Fields */}
-            {provider.specificFields.includes('subdivisionCode') && 
-              renderField('subdivisionCode', 'Subdivision Code')}
-            {provider.specificFields.includes('consumerCategory') && 
-              renderField('consumerCategory', 'Consumer Category')}
-            {provider.specificFields.includes('loadSanctioned') && 
-              renderField('loadSanctioned', 'Load Sanctioned (KW)')}
-            {provider.specificFields.includes('wardNumber') && 
-              renderField('wardNumber', 'Ward Number')}
-            {provider.specificFields.includes('propertyNumber') && 
-              renderField('propertyNumber', 'Property Number')}
-            {provider.specificFields.includes('surveyNumber') && 
-              renderField('surveyNumber', 'Survey Number')}
-          </div>
-        </div>
+                {/* Service Specific Fields */}
+                {provider.specificFields.includes('subdivisionCode') && 
+                  renderField('subdivisionCode', 'Subdivision Code')}
+                {provider.specificFields.includes('consumerCategory') && 
+                  renderField('consumerCategory', 'Consumer Category')}
+                {provider.specificFields.includes('loadSanctioned') && 
+                  renderField('loadSanctioned', 'Load Sanctioned (KW)')}
+                {provider.specificFields.includes('wardNumber') && 
+                  renderField('wardNumber', 'Ward Number')}
+                {provider.specificFields.includes('propertyNumber') && 
+                  renderField('propertyNumber', 'Property Number')}
+                {provider.specificFields.includes('surveyNumber') && 
+                  renderField('surveyNumber', 'Survey Number')}
+              </div>
+            </div>
 
-        {/* Document Upload */}
-        <div className="mb-8">
-          <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-            <Upload className="w-5 h-5" />
-            Required Documents
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {provider.documents.includes('identityProof') && 
-              renderFileUpload('identityProof', 'Identity Proof (Aadhaar/PAN/Passport)')}
-            {provider.documents.includes('addressProof') && 
-              renderFileUpload('addressProof', 'Address Proof')}
-            {provider.documents.includes('nameChangeProof') && 
-              renderFileUpload('nameChangeProof', 'Name Change Proof (Marriage Certificate/Gazette/Affidavit)')}
-            {provider.documents.includes('connectionBill') && 
-              renderFileUpload('connectionBill', 'Latest Connection Bill')}
-            {provider.documents.includes('propertyDocuments') && 
-              renderFileUpload('propertyDocuments', 'Property Documents')}
-          </div>
-        </div>
+            {/* Document Upload */}
+            <div className="mb-8">
+              <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                <Upload className="w-5 h-5" />
+                Required Documents
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {provider.documents.includes('identityProof') && 
+                  renderFileUpload('identityProof', 'Identity Proof (Aadhaar/PAN/Passport)')}
+                {provider.documents.includes('addressProof') && 
+                  renderFileUpload('addressProof', 'Address Proof')}
+                {provider.documents.includes('nameChangeProof') && 
+                  renderFileUpload('nameChangeProof', 'Name Change Proof (Marriage Certificate/Gazette/Affidavit)')}
+                {provider.documents.includes('connectionBill') && 
+                  renderFileUpload('connectionBill', 'Latest Connection Bill')}
+                {provider.documents.includes('propertyDocuments') && 
+                  renderFileUpload('propertyDocuments', 'Property Documents')}
+              </div>
+            </div>
+          </>
+        )}
 
         {/* Submit Button */}
         <div className="flex items-center justify-between pt-6 border-t border-gray-200">
@@ -494,25 +608,57 @@ const NameChangeApplication = () => {
             Back to Providers
           </Link>
           
-          <button
-            type="submit"
-            disabled={loading}
-            className="px-8 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-          >
-            {loading ? (
-              <>
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                Submitting...
-              </>
-            ) : (
-              <>
-                <CheckCircle className="w-5 h-5" />
-                Submit Application
-              </>
+          <div className="flex items-center gap-4">
+            {provider.aiSupported && (
+              <div className="flex items-center gap-2 text-sm text-purple-600 bg-gradient-to-r from-blue-50 to-purple-50 px-4 py-3 rounded-lg border border-purple-200">
+                <Bot className="w-5 h-5" />
+                <span className="font-medium">Browser-use AI Auto-fill Supported</span>
+                <Sparkles className="w-5 h-5" />
+                <span className="text-xs text-purple-500 ml-2">Visible automation process</span>
+              </div>
             )}
-          </button>
+            
+            <button
+              type="submit"
+              disabled={loading}
+              className={`px-8 py-3 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 ${
+                provider.aiSupported 
+                  ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700' 
+                  : 'bg-blue-600 text-white hover:bg-blue-700'
+              }`}
+            >
+              {loading ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  Submitting...
+                </>
+              ) : provider.aiSupported ? (
+                <>
+                  <Bot className="w-5 h-5" />
+                  Start AI Auto-fill in Website
+                  <span className="text-xs opacity-75 ml-1">(Live Automation)</span>
+                </>
+              ) : (
+                <>
+                  <CheckCircle className="w-5 h-5" />
+                  Submit Application
+                </>
+              )}
+            </button>
+          </div>
         </div>
       </form>
+
+      {/* AI Automation Modal */}
+      {showAIAutomation && (
+        <AIAutomationIframe
+          provider={provider.name}
+          userData={prepareUserDataForAI()}
+          portalUrl={provider.portalUrl}
+          onAutomationComplete={handleAIAutomationComplete}
+          onClose={handleCloseAIAutomation}
+        />
+      )}
     </div>
   );
 };

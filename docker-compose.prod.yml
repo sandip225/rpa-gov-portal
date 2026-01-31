@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  # Backend Service
+  # Backend Service with AI Automation
   backend:
     build:
       context: ./backend
@@ -15,11 +15,14 @@ services:
       - ALGORITHM=HS256
       - ACCESS_TOKEN_EXPIRE_MINUTES=30
       - PYTHONPATH=/app
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - BROWSER_USE_API_KEY=${BROWSER_USE_API_KEY}
     volumes:
       - ./backend:/app
       - backend-data:/app/data
       - ./backend/screenshots:/app/screenshots
       - ./backend/uploads:/app/uploads
+      - ./backend/user_data:/app/user_data
     networks:
       - india-portal-network
     restart: unless-stopped
@@ -50,7 +53,7 @@ services:
       retries: 3
       start_period: 40s
 
-  # Nginx Reverse Proxy
+  # Nginx Reverse Proxy with SSL
   nginx:
     image: nginx:alpine
     container_name: india-portal-nginx
@@ -58,7 +61,8 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx.prod.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
       - ./frontend/dist:/usr/share/nginx/html:ro
     depends_on:
       - backend
@@ -72,6 +76,17 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+
+  # Certbot for SSL certificates
+  certbot:
+    image: certbot/certbot
+    container_name: india-portal-certbot
+    volumes:
+      - ./ssl:/etc/letsencrypt
+      - ./ssl-challenge:/var/www/certbot
+    command: certonly --webroot --webroot-path=/var/www/certbot --email admin@indiaportals.com --agree-tos --no-eff-email -d indiaportals.com -d www.indiaportals.com
+    depends_on:
+      - nginx
 
 volumes:
   backend-data:

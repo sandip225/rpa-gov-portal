@@ -45,8 +45,14 @@
   "content_scripts": [
     {
       "matches": [
+        "https://connect.torrentpower.com/tplcp/application/namechangerequest*"
+      ],
+      "js": ["torrent-power-autofill.js"],
+      "run_at": "document_end"
+    },
+    {
+      "matches": [
         "https://portal.guvnl.in/*",
-        "https://connect.torrentpower.com/*",
         "https://www.adanigas.com/*",
         "https://www.gujaratgas.com/*",
         "https://ahmedabadcity.gov.in/*",
