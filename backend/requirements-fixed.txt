@@ -1,4 +1,4 @@
-# Core FastAPI dependencies
+# Core FastAPI dependencies - Compatible versions
 fastapi==0.104.1
 uvicorn==0.24.0
 pydantic==2.5.0
@@ -31,6 +31,9 @@ email-validator==2.1.0
 # Browser automation - Production ready
 selenium==4.15.2
 webdriver-manager==4.0.1
+
+# Async support
+anyio==3.7.1
 
 # System
 setuptools

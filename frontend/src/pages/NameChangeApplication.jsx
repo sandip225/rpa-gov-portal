@@ -302,7 +302,6 @@ const NameChangeApplication = () => {
 
   const handleCloseAutomation = () => {
     setShowAutomation(false);
-    }
   };
 
   const handleAutoFill = async () => {
@@ -613,10 +612,6 @@ const NameChangeApplication = () => {
           </Link>
 
           <div className="flex items-center gap-4">
-            {providerId === 'torrent-power' ? (
-              <button
-                type="button"
-                onClick={handleAutoFill}
             {providerId === 'torrent-power' && provider.aiSupported ? (
               <button
                 type="submit"

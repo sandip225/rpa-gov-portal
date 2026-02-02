@@ -29,7 +29,7 @@ const SITE_MAPPINGS = {
     name: 'Torrent Power',
     fields: {
       // City dropdown - look for select with Ahmedabad option
-      city: ['select.form-control', 'select.form-select', 'select[class*="city"]', 'select:has(option[value*="Ahmedabad"])'],
+      city: ['select.form-control', 'select.form-select', 'select[class*="city"]', 'select:has(option[value*="Ahmedabad"])', 'select'],
       // Service Number field
       service_number: [
         'input[placeholder*="Service Number"]',
@@ -37,7 +37,8 @@ const SITE_MAPPINGS = {
         'input[placeholder*="Service"]',
         'input.form-control[type="text"]:nth-of-type(1)',
         'input[name*="service"]',
-        'input[id*="service"]'
+        'input[id*="service"]',
+        'input[type="text"]:nth-of-type(1)'
       ],
       // T No field
       t_no: [
@@ -46,24 +47,27 @@ const SITE_MAPPINGS = {
         'input[placeholder*="TNo"]',
         'input[name*="tno"]',
         'input[name*="t_no"]',
-        'input[id*="tno"]'
+        'input[id*="tno"]',
+        'input[type="text"]:nth-of-type(2)'
       ],
       // Mobile Number field
       mobile: [
+        'input[type="tel"]',
         'input[placeholder*="Mobile"]',
         'input[placeholder*="mobile"]',
-        'input[type="tel"]',
         'input[name*="mobile"]',
         'input[id*="mobile"]',
-        'input[placeholder*="Phone"]'
+        'input[placeholder*="Phone"]',
+        'input[type="text"]:nth-of-type(3)'
       ],
       // Email field
       email: [
+        'input[type="email"]',
         'input[placeholder*="Email"]',
         'input[placeholder*="email"]',
-        'input[type="email"]',
         'input[name*="email"]',
-        'input[id*="email"]'
+        'input[id*="email"]',
+        'input[type="text"]:nth-of-type(4)'
       ]
     }
   },
@@ -329,6 +333,60 @@ function addAutoFillButton() {
 
 // Auto-fill on page load if data is available
 function autoFillOnLoad() {
+  // Check if we're on Torrent Power and have data from our portal
+  if (window.location.hostname === 'connect.torrentpower.com') {
+    console.log('🔍 Extension: On Torrent Power website, checking for data...');
+    
+    // Method 1: Check URL query parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const serviceNumber = urlParams.get('service_number');
+    const tNumber = urlParams.get('t_number');
+    const mobile = urlParams.get('mobile');
+    const email = urlParams.get('email');
+    const city = urlParams.get('city');
+    
+    if (serviceNumber || mobile) {
+      console.log('📦 Extension: Found data in URL params');
+      
+      setTimeout(() => {
+        fillTorrentPowerForm({
+          city: city || 'Ahmedabad',
+          service_number: serviceNumber,
+          t_number: tNumber,
+          mobile: mobile,
+          email: email
+        });
+      }, 2000);
+      return;
+    }
+    
+    // Method 2: Check localStorage for data from our portal
+    try {
+      const storedData = localStorage.getItem('torrent_autofill_data');
+      console.log('📦 Extension: Checking localStorage:', storedData);
+      
+      if (storedData) {
+        const data = JSON.parse(storedData);
+        console.log('📋 Extension: Parsed data:', data);
+        
+        // Check if data is fresh (less than 10 minutes old)
+        if (Date.now() - data.timestamp < 10 * 60 * 1000) {
+          console.log('✅ Extension: Data is fresh, auto-filling...');
+          setTimeout(() => {
+            fillTorrentPowerForm(data);
+          }, 2000);
+        } else {
+          console.warn('⚠️ Extension: Data expired (older than 10 minutes)');
+          localStorage.removeItem('torrent_autofill_data');
+        }
+      } else {
+        console.log('ℹ️ Extension: No stored data found');
+      }
+    } catch (e) {
+      console.error('❌ Extension: Error in auto-fill:', e);
+    }
+  }
+  
   // Check if we're on DGVCL portal and have data
   if (window.location.hostname === 'portal.guvnl.in') {
     console.log('🔍 Extension: Checking for stored data...');
@@ -389,6 +447,122 @@ function autoFillOnLoad() {
     } catch (e) {
       console.error('❌ Extension: Error in auto-fill:', e);
     }
+  }
+}
+
+// Helper function to fill Torrent Power form specifically
+function fillTorrentPowerForm(data) {
+  console.log('🚀 Extension: Starting Torrent Power auto-fill with data:', data);
+  
+  let filled = 0;
+  
+  try {
+    // 1. Fill City dropdown
+    if (data.city) {
+      const citySelect = document.querySelector('select');
+      if (citySelect) {
+        const options = citySelect.querySelectorAll('option');
+        for (let option of options) {
+          if (option.textContent.toLowerCase().includes(data.city.toLowerCase())) {
+            citySelect.value = option.value;
+            citySelect.dispatchEvent(new Event('change', { bubbles: true }));
+            filled++;
+            console.log('✅ Extension: City filled:', data.city);
+            
+            // Highlight field
+            citySelect.style.backgroundColor = '#d4edda';
+            citySelect.style.border = '2px solid #28a745';
+            break;
+          }
+        }
+      }
+    }
+    
+    // 2. Fill Service Number
+    if (data.service_number) {
+      const serviceInputs = document.querySelectorAll('input[type="text"]');
+      if (serviceInputs[0]) {
+        serviceInputs[0].value = data.service_number;
+        serviceInputs[0].dispatchEvent(new Event('input', { bubbles: true }));
+        serviceInputs[0].dispatchEvent(new Event('change', { bubbles: true }));
+        filled++;
+        console.log('✅ Extension: Service Number filled:', data.service_number);
+        
+        // Highlight field
+        serviceInputs[0].style.backgroundColor = '#d4edda';
+        serviceInputs[0].style.border = '2px solid #28a745';
+      }
+    }
+    
+    // 3. Fill T Number
+    if (data.t_number) {
+      const serviceInputs = document.querySelectorAll('input[type="text"]');
+      if (serviceInputs[1]) {
+        serviceInputs[1].value = data.t_number;
+        serviceInputs[1].dispatchEvent(new Event('input', { bubbles: true }));
+        serviceInputs[1].dispatchEvent(new Event('change', { bubbles: true }));
+        filled++;
+        console.log('✅ Extension: T Number filled:', data.t_number);
+        
+        // Highlight field
+        serviceInputs[1].style.backgroundColor = '#d4edda';
+        serviceInputs[1].style.border = '2px solid #28a745';
+      }
+    }
+    
+    // 4. Fill Mobile
+    if (data.mobile) {
+      const mobileInput = document.querySelector('input[type="tel"]') || document.querySelectorAll('input[type="text"]')[2];
+      if (mobileInput) {
+        mobileInput.value = data.mobile;
+        mobileInput.dispatchEvent(new Event('input', { bubbles: true }));
+        mobileInput.dispatchEvent(new Event('change', { bubbles: true }));
+        filled++;
+        console.log('✅ Extension: Mobile filled:', data.mobile);
+        
+        // Highlight field
+        mobileInput.style.backgroundColor = '#d4edda';
+        mobileInput.style.border = '2px solid #28a745';
+      }
+    }
+    
+    // 5. Fill Email
+    if (data.email) {
+      const emailInput = document.querySelector('input[type="email"]') || document.querySelectorAll('input[type="text"]')[3];
+      if (emailInput) {
+        emailInput.value = data.email;
+        emailInput.dispatchEvent(new Event('input', { bubbles: true }));
+        emailInput.dispatchEvent(new Event('change', { bubbles: true }));
+        filled++;
+        console.log('✅ Extension: Email filled:', data.email);
+        
+        // Highlight field
+        emailInput.style.backgroundColor = '#d4edda';
+        emailInput.style.border = '2px solid #28a745';
+      }
+    }
+    
+    // Show completion notification
+    if (filled > 0) {
+      const notification = document.createElement('div');
+      notification.innerHTML = `
+        <div style="position: fixed; top: 20px; right: 20px; background: #28a745; color: white; padding: 15px 25px; border-radius: 10px; font-family: Arial, sans-serif; font-size: 14px; z-index: 999999; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
+          ✅ Auto-fill Completed!<br>
+          Fields filled: ${filled}/5<br>
+          <small>Please review and submit</small>
+        </div>
+      `;
+      document.body.appendChild(notification);
+      
+      setTimeout(() => {
+        notification.remove();
+      }, 5000);
+      
+      console.log(`📊 Extension: Torrent Power auto-fill completed: ${filled}/5 fields`);
+    }
+    
+  } catch (error) {
+    console.error('❌ Extension: Torrent Power auto-fill error:', error);
   }
 }
 

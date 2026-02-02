@@ -8,6 +8,10 @@ browser-use/
 node_modules/
 */node_modules/
 
+# Deployment packages
+deployment-package/
+guided-flow-whatsapp/
+
 # Environment files
 .env
 .env.local

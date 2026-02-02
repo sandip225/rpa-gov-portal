@@ -1,5 +1,5 @@
 services:
-  # Backend Service with AI Automation
+  # Backend Service with AI Automation and RPA
   backend:
     build:
       context: ./backend
@@ -14,9 +14,15 @@ services:
       - ./backend/screenshots:/app/screenshots
       - ./backend/uploads:/app/uploads
       - ./backend/user_data:/app/user_data
+      - /dev/shm:/dev/shm  # For Chrome stability
     networks:
       - india-portal-network
     restart: unless-stopped
+    # Add capabilities for Chrome/RPA
+    cap_add:
+      - SYS_ADMIN
+    security_opt:
+      - seccomp:unconfined
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s
