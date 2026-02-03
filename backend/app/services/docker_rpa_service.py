@@ -32,7 +32,7 @@ class DockerTorrentRPA:
             options = Options()
             
             # Docker-specific options
-            options.add_argument("--headless=new")
+            # options.add_argument("--headless=new")  # Commented out for VNC viewing
             options.add_argument("--no-sandbox")
             options.add_argument("--disable-dev-shm-usage")
             options.add_argument("--disable-gpu")

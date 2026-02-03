@@ -1,0 +1,52 @@
+# Dockerfile with VNC support to see browser automation
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install desktop environment, VNC, and browser
+RUN apt-get update && apt-get install -y \
+    chromium \
+    chromium-driver \
+    xfce4 \
+    xfce4-goodies \
+    tightvncserver \
+    dbus-x11 \
+    wget \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Setup VNC
+RUN mkdir -p ~/.vnc && \
+    echo "password" | vncpasswd -f > ~/.vnc/passwd && \
+    chmod 600 ~/.vnc/passwd
+
+# Create VNC startup script
+RUN echo '#!/bin/bash\n\
+unset SESSION_MANAGER\n\
+unset DBUS_SESSION_BUS_ADDRESS\n\
+startxfce4 &' > ~/.vnc/xstartup && \
+    chmod +x ~/.vnc/xstartup
+
+# Copy requirements and install Python dependencies
+COPY backend/requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application code
+COPY backend/ /app/
+
+# Set environment variables
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    DISPLAY=:1
+
+# Expose ports (8000 for API, 5901 for VNC)
+EXPOSE 8000 5901
+
+# Create startup script
+RUN echo '#!/bin/bash\n\
+vncserver :1 -geometry 1920x1080 -depth 24\n\
+uvicorn app.main:app --host 0.0.0.0 --port 8000' > /start.sh && \
+    chmod +x /start.sh
+
+# Start VNC and backend
+CMD ["/start.sh"]

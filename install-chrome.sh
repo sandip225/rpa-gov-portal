@@ -30,6 +30,13 @@ if [ "$OS" = "linux" ]; then
     echo "📦 Updating package manager..."
     sudo apt-get update
     
+    echo "📦 Adding Google Chrome repository..."
+    wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo gpg --dearmor -o /usr/share/keyrings/google-chrome.gpg
+    echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome.gpg] http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list
+    
+    echo "📦 Updating package list..."
+    sudo apt-get update
+    
     echo "📦 Installing Google Chrome..."
     sudo apt-get install -y google-chrome-stable
     
@@ -37,9 +44,17 @@ if [ "$OS" = "linux" ]; then
         echo "✅ Chrome installed successfully"
         google-chrome --version
     else
-        echo "❌ Failed to install Chrome"
-        echo "Try manual installation: https://www.google.com/chrome/"
-        exit 1
+        echo "⚠️ Chrome installation failed, trying Chromium instead..."
+        sudo apt-get install -y chromium-browser chromium-driver
+        
+        if [ $? -eq 0 ]; then
+            echo "✅ Chromium installed successfully"
+            chromium-browser --version
+        else
+            echo "❌ Failed to install Chrome or Chromium"
+            echo "Try manual installation: https://www.google.com/chrome/"
+            exit 1
+        fi
     fi
     
 elif [ "$OS" = "mac" ]; then
@@ -75,14 +90,11 @@ python3 --version
 
 echo ""
 echo "Installing webdriver-manager (handles ChromeDriver automatically)..."
-pip3 install --upgrade webdriver-manager
-
-if [ $? -eq 0 ]; then
-    echo "✅ webdriver-manager installed successfully"
-else
-    echo "❌ Failed to install webdriver-manager"
-    exit 1
-fi
+# Don't install system-wide on Ubuntu 24.04+
+# Users should use virtual environment in their project
+echo "✅ Skipping system-wide webdriver-manager installation"
+echo "   Install it in your project's virtual environment instead:"
+echo "   cd ~/rpa-gov-portal && python3 -m venv venv && source venv/bin/activate && pip install webdriver-manager"
 
 echo ""
 echo "✅ Installation complete!"
