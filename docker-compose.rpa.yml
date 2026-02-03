@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  rpa-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.rpa
+    container_name: rpa-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=sqlite:///./test.db
+      - SECRET_KEY=your-secret-key-change-this
+      - ACCESS_TOKEN_EXPIRE_MINUTES=30
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./backend:/app
+      - ./backend/screenshots:/app/screenshots
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+    networks:
+      - rpa-network
+    # Uncomment for production with nginx
+    # expose:
+    #   - "8000"
+
+  # Optional: Nginx reverse proxy
+  nginx:
+    image: nginx:alpine
+    container_name: rpa-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.prod.conf:/etc/nginx/nginx.conf:ro
+      - ./frontend/dist:/usr/share/nginx/html:ro
+      - ./certs:/etc/nginx/certs:ro
+    depends_on:
+      - rpa-backend
+    restart: unless-stopped
+    networks:
+      - rpa-network
+    # Uncomment for production
+    # environment:
+    #   - DOMAIN=your-domain.com
+
+networks:
+  rpa-network:
+    driver: bridge
+
+volumes:
+  rpa-data:
+    driver: local
