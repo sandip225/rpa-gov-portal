@@ -2,13 +2,8 @@ import axios from 'axios';
 
 // Dynamic API base URL - works for both localhost and production
 const getApiBaseUrl = () => {
-  // Check if we're in development (localhost)
-  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-    return 'http://localhost:8000/api';
-  }
-  
-  // Production EC2 URL - Updated IP
-  return 'http://3.88.187.173:8000/api';
+  // Use relative URL - nginx will proxy /api to backend
+  return '/api';
 };
 
 const api = axios.create({

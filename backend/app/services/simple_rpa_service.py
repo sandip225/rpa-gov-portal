@@ -6,12 +6,14 @@ import time
 import os
 import logging
 import platform
+import stat
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException, NoSuchElementException
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
@@ -89,15 +91,24 @@ class SimpleTorrentRPA:
                             if driver_path.endswith('.exe'):
                                 break
                 
-                service = Service(driver_path)
-                self.driver = webdriver.Chrome(service=service, options=options)
-                logger.info("✅ Chrome driver setup successful with webdriver-manager")
+                if os.path.exists(driver_path):
+                    service = Service(driver_path)
+                    self.driver = webdriver.Chrome(service=service, options=options)
+                    logger.info("✅ Chrome driver setup successful with webdriver-manager")
+                else:
+                    logger.error(f"❌ ChromeDriver path does not exist: {driver_path}")
+                    raise FileNotFoundError(f"ChromeDriver not found at {driver_path}")
                 
-            except ImportError:
-                logger.info("⚠️ webdriver-manager not available, trying system Chrome...")
-                # Fallback to system Chrome
-                self.driver = webdriver.Chrome(options=options)
-                logger.info("✅ Chrome driver setup successful with system Chrome")
+            except (ImportError, FileNotFoundError, Exception) as wdm_error:
+                logger.warning(f"⚠️ webdriver-manager approach failed: {wdm_error}")
+                logger.info("🔧 Trying system Chrome without explicit service...")
+                try:
+                    # Fallback to system Chrome (Selenium will find it automatically)
+                    self.driver = webdriver.Chrome(options=options)
+                    logger.info("✅ Chrome driver setup successful with system Chrome")
+                except Exception as sys_error:
+                    logger.error(f"❌ System Chrome also failed: {sys_error}")
+                    raise
             
             # Set timeouts
             self.driver.implicitly_wait(10)
@@ -114,11 +125,18 @@ class SimpleTorrentRPA:
         except Exception as e:
             logger.error(f"❌ Chrome setup failed: {e}")
             logger.error(f"❌ Error type: {type(e).__name__}")
+            logger.error(f"❌ Full traceback: {repr(e)}")
             
             # Provide helpful suggestions
-            if "chromedriver" in str(e).lower():
-                logger.error("💡 Suggestion: Install Chrome browser and ensure it's updated")
-                logger.error("💡 Or run: pip install webdriver-manager")
+            error_str = str(e).lower()
+            if "chromedriver" in error_str or "chrome" in error_str:
+                logger.error("💡 SOLUTION: Chrome browser is not installed or not found")
+                logger.error("💡 On Linux: sudo apt-get install -y google-chrome-stable")
+                logger.error("💡 On Windows: Download from https://www.google.com/chrome/")
+                logger.error("💡 On Mac: brew install google-chrome")
+            elif "permission denied" in error_str:
+                logger.error("💡 SOLUTION: Permission issue with ChromeDriver")
+                logger.error("💡 Try: chmod +x /path/to/chromedriver")
             
             return False
     
