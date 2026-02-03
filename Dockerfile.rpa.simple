@@ -1,19 +1,14 @@
-# Simplified Dockerfile for RPA Backend with Chromium support
-# Uses Chromium instead of Chrome (easier to install in Docker)
+# Minimal Dockerfile for RPA Backend - Works with any Linux
+# Uses only essential packages
 
 FROM python:3.11-slim
 
 WORKDIR /app
 
-# Install Chromium and dependencies (much simpler than Chrome)
+# Install only essential packages (no GUI libraries needed for headless)
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    chromium-browser \
+    chromium \
     chromium-driver \
-    libxss1 \
-    libappindicator1 \
-    libindicator7 \
-    fonts-liberation \
-    xdg-utils \
     wget \
     curl \
     && rm -rf /var/lib/apt/lists/*
