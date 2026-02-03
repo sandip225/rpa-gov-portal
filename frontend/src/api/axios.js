@@ -3,7 +3,7 @@ import axios from 'axios';
 // Dynamic API base URL - works for both localhost and production
 const getApiBaseUrl = () => {
   // Use relative URL - nginx will proxy /api to backend
-  return '/api';
+  return 'http://your-ec2-ip:8000/api';
 };
 
 const api = axios.create({
