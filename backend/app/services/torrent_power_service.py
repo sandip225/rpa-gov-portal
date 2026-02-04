@@ -178,5 +178,13 @@ class TorrentPowerService:
             logger.error(f"❌ Cleanup error: {e}")
 
 
-# Global service instance
-torrent_power_service = TorrentPowerService(headless=False)  # Keep browser visible for user interaction
+# Global service instance - auto-detect environment
+import platform
+import os
+
+# Use headless mode on Linux/EC2, visible browser on Windows localhost
+is_linux = platform.system() == 'Linux'
+is_ec2 = os.path.exists('/home/ubuntu') or os.environ.get('AWS_EXECUTION_ENV')
+use_headless = is_linux or is_ec2
+
+torrent_power_service = TorrentPowerService(headless=use_headless)
