@@ -17,6 +17,7 @@ import TestRPA from './pages/TestRPA';
 import TestAutomation from './pages/TestAutomation';
 import TestAutomationDirect from './pages/TestAutomationDirect';
 import TorrentPowerDemo from './pages/TorrentPowerDemo';
+import TorrentPowerClientSide from './pages/TorrentPowerClientSide';
 import SupplierVerification from './pages/SupplierVerification';
 import Support from './pages/Support';
 import OfflineIndicator from './components/OfflineIndicator';
@@ -78,6 +79,7 @@ function App() {
           <Route path="/test-automation" element={<TestAutomation />} />
           <Route path="/direct-rpa-test" element={<TestAutomationDirect />} />
           <Route path="/torrent-demo" element={<TorrentPowerDemo />} />
+          <Route path="/torrent-autofill" element={<TorrentPowerClientSide />} />
           <Route path="/" element={
             <ProtectedRoute>
               <ResponsiveLayout />
