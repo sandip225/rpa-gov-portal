@@ -25,37 +25,59 @@ class SimpleTorrentRPA:
         self.wait = None
         
     def setup_driver(self):
-        """Windows localhost Chrome setup"""
+        """Setup Chrome driver for both Windows and Linux"""
         try:
-            logger.info("🚀 Setting up Chrome driver for Windows localhost...")
+            logger.info("🚀 Setting up Chrome driver...")
             
-            # Detect Windows environment
+            # Detect environment
             is_windows = platform.system() == 'Windows'
+            is_linux = platform.system() == 'Linux'
             logger.info(f"🔍 Platform detected: {platform.system()}")
             
-            # Chrome options for localhost (visible browser)
+            # Chrome options
             options = Options()
             
-            if is_windows:
-                # Windows localhost - visible browser for debugging
-                options.add_argument("--start-maximized")
-                options.add_argument("--disable-notifications")
-                options.add_argument("--disable-popup-blocking")
-                logger.info("💻 Using Windows localhost options (visible browser)")
-            else:
-                # Fallback for other systems
-                options.add_argument("--headless")
+            if is_linux:
+                # Linux/EC2 - headless mode with proper flags
+                options.add_argument("--headless=new")
                 options.add_argument("--no-sandbox")
                 options.add_argument("--disable-dev-shm-usage")
-                logger.info("🐧 Using headless options for non-Windows")
+                options.add_argument("--disable-gpu")
+                options.add_argument("--disable-software-rasterizer")
+                logger.info("🐧 Using Linux headless options")
+                
+                # Try to find Chrome/Chromium binary on Linux
+                chromium_paths = [
+                    "/usr/bin/google-chrome",
+                    "/usr/bin/google-chrome-stable",
+                    "/usr/bin/chromium-browser",
+                    "/usr/bin/chromium",
+                ]
+                
+                for path in chromium_paths:
+                    if os.path.exists(path):
+                        logger.info(f"🔍 Found browser at: {path}")
+                        options.binary_location = path
+                        break
+                        
+            elif is_windows:
+                # Windows localhost - visible browser for debugging
+                options.add_argument("--start-maximized")
+                logger.info("💻 Using Windows visible browser options")
             
             # Common options
-            options.add_argument("--disable-gpu")
             options.add_argument("--window-size=1920,1080")
             options.add_argument("--disable-extensions")
-            options.add_argument("--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+            options.add_argument("--disable-notifications")
+            options.add_argument("--disable-popup-blocking")
+            options.add_argument("--disable-translate")
+            options.add_argument("--disable-logging")
+            options.add_argument("--no-first-run")
+            options.add_argument("--no-default-browser-check")
+            options.add_argument("--ignore-certificate-errors")
+            options.add_argument("--user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
             
-            # Try webdriver-manager first (best for localhost)
+            # Try webdriver-manager first
             try:
                 logger.info("🔧 Trying webdriver-manager...")
                 from webdriver_manager.chrome import ChromeDriverManager
@@ -63,16 +85,12 @@ class SimpleTorrentRPA:
                 driver_path = ChromeDriverManager().install()
                 logger.info(f"✅ ChromeDriver installed at: {driver_path}")
                 
-                # Fix webdriver-manager path issue on Windows
-                if 'THIRD_PARTY_NOTICES' in driver_path or not driver_path.endswith('.exe'):
-                    # Extract the correct directory and find the actual chromedriver binary
+                # Fix path if needed (Windows issue)
+                if is_windows and ('THIRD_PARTY_NOTICES' in driver_path or not driver_path.endswith('.exe')):
                     driver_dir = os.path.dirname(driver_path)
-                    
-                    # Look for the actual chromedriver binary
                     possible_paths = [
                         os.path.join(driver_dir, 'chromedriver.exe'),
                         os.path.join(driver_dir, 'chromedriver-win32', 'chromedriver.exe'),
-                        os.path.join(os.path.dirname(driver_dir), 'chromedriver.exe'),
                     ]
                     
                     for possible_path in possible_paths:
@@ -80,30 +98,39 @@ class SimpleTorrentRPA:
                             driver_path = possible_path
                             logger.info(f"🔧 Fixed ChromeDriver path: {driver_path}")
                             break
-                    else:
-                        # Search for any chromedriver.exe file in the directory tree
-                        for root, dirs, files in os.walk(os.path.dirname(driver_dir)):
-                            for file in files:
-                                if file == 'chromedriver.exe':
-                                    driver_path = os.path.join(root, file)
-                                    logger.info(f"🔧 Found ChromeDriver binary: {driver_path}")
-                                    break
-                            if driver_path.endswith('.exe'):
-                                break
+                
+                # Fix path if needed (Linux issue)
+                if is_linux and not driver_path.endswith('chromedriver'):
+                    driver_dir = os.path.dirname(driver_path)
+                    possible_paths = [
+                        os.path.join(driver_dir, 'chromedriver'),
+                        os.path.join(driver_dir, 'chromedriver-linux64', 'chromedriver'),
+                    ]
+                    
+                    for possible_path in possible_paths:
+                        if os.path.exists(possible_path):
+                            driver_path = possible_path
+                            logger.info(f"🔧 Fixed ChromeDriver path: {driver_path}")
+                            break
                 
                 if os.path.exists(driver_path):
+                    # Make executable on Linux
+                    if is_linux:
+                        try:
+                            os.chmod(driver_path, stat.S_IRWXU | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH)
+                        except Exception as chmod_error:
+                            logger.warning(f"⚠️ Could not chmod driver: {chmod_error}")
+                    
                     service = Service(driver_path)
                     self.driver = webdriver.Chrome(service=service, options=options)
                     logger.info("✅ Chrome driver setup successful with webdriver-manager")
                 else:
-                    logger.error(f"❌ ChromeDriver path does not exist: {driver_path}")
                     raise FileNotFoundError(f"ChromeDriver not found at {driver_path}")
                 
-            except (ImportError, FileNotFoundError, Exception) as wdm_error:
-                logger.warning(f"⚠️ webdriver-manager approach failed: {wdm_error}")
-                logger.info("🔧 Trying system Chrome without explicit service...")
+            except Exception as wdm_error:
+                logger.warning(f"⚠️ webdriver-manager failed: {wdm_error}")
+                logger.info("🔧 Trying system Chrome...")
                 try:
-                    # Fallback to system Chrome (Selenium will find it automatically)
                     self.driver = webdriver.Chrome(options=options)
                     logger.info("✅ Chrome driver setup successful with system Chrome")
                 except Exception as sys_error:
@@ -133,7 +160,6 @@ class SimpleTorrentRPA:
                 logger.error("💡 SOLUTION: Chrome browser is not installed or not found")
                 logger.error("💡 On Linux: sudo apt-get install -y google-chrome-stable")
                 logger.error("💡 On Windows: Download from https://www.google.com/chrome/")
-                logger.error("💡 On Mac: brew install google-chrome")
             elif "permission denied" in error_str:
                 logger.error("💡 SOLUTION: Permission issue with ChromeDriver")
                 logger.error("💡 Try: chmod +x /path/to/chromedriver")

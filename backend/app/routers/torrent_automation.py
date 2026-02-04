@@ -102,7 +102,7 @@ async def start_torrent_power_rpa_automation(
         print("🤖 Starting simple RPA-based automation...")
         
         try:
-            from app.services.docker_rpa_service import DockerTorrentRPA
+            from app.services.simple_rpa_service import SimpleTorrentRPA
             
             # Prepare the data for RPA
             rpa_data = {
@@ -113,10 +113,10 @@ async def start_torrent_power_rpa_automation(
                 "email": request.email
             }
             
-            print(f"📋 Docker RPA Data: {rpa_data}")
+            print(f"📋 Simple RPA Data: {rpa_data}")
             
-            # Initialize and run Docker RPA
-            rpa = DockerTorrentRPA()
+            # Initialize and run Simple RPA
+            rpa = SimpleTorrentRPA()
             result = rpa.run_automation(rpa_data)
             
             print(f"📊 Simple RPA Result: {result}")
