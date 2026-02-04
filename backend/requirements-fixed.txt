@@ -14,7 +14,7 @@ python-multipart==0.0.6
 
 # File handling
 aiofiles==23.2.1
-Pillow==10.1.0
+Pillow>=10.3.0
 
 # OCR support
 pytesseract==0.3.10
