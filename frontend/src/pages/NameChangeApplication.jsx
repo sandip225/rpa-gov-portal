@@ -14,13 +14,13 @@ const NameChangeApplication = () => {
   const providerId = searchParams.get('provider');
 
   const [formData, setFormData] = useState({
-    // Torrent Power Specific Fields (only for torrent-power)
+    // Torrent Power Specific Fields (only for torrent-power) - PRE-FILLED
     city: 'Ahmedabad',
-    serviceNumber: '',
-    tNumber: '',
-    mobile: '',
-    email: '',
-    confirmEmail: '',
+    serviceNumber: '3384225',
+    tNumber: 'T12345',
+    mobile: '9067490913',
+    email: 'demo@gmail.com',
+    confirmEmail: 'demo@gmail.com',
 
     // Original fields for other providers
     currentName: '',
