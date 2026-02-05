@@ -234,7 +234,7 @@ class SimpleTorrentRPA:
                 for option in options:
                     if city.lower() in option.text.lower():
                         select.select_by_value(option.get_attribute('value'))
-                        filled_fields.append("City selected")
+                        filled_fields.append("✅ City selected")
                         logger.info(f"✅ City selected: {option.text}")
                         
                         # Highlight the field
@@ -273,7 +273,7 @@ class SimpleTorrentRPA:
                 if service_input and form_data.get('service_number'):
                     service_input.clear()
                     service_input.send_keys(form_data['service_number'])
-                    filled_fields.append("Service Number filled")
+                    filled_fields.append("✅ Service Number filled")
                     logger.info(f"✅ Service Number filled: {form_data['service_number']}")
                     
                     # Highlight the field
@@ -312,7 +312,7 @@ class SimpleTorrentRPA:
                 if t_input and form_data.get('t_number'):
                     t_input.clear()
                     t_input.send_keys(form_data['t_number'])
-                    filled_fields.append("T Number filled")
+                    filled_fields.append("✅ T Number filled")
                     logger.info(f"✅ T Number filled: {form_data['t_number']}")
                     
                     # Highlight the field
@@ -351,7 +351,7 @@ class SimpleTorrentRPA:
                 if mobile_input and form_data.get('mobile'):
                     mobile_input.clear()
                     mobile_input.send_keys(form_data['mobile'])
-                    filled_fields.append("Mobile Number filled")
+                    filled_fields.append("✅ Mobile Number filled")
                     logger.info(f"✅ Mobile filled: {form_data['mobile']}")
                     
                     # Highlight the field
@@ -390,7 +390,7 @@ class SimpleTorrentRPA:
                 if email_input and form_data.get('email'):
                     email_input.clear()
                     email_input.send_keys(form_data['email'])
-                    filled_fields.append("Email filled")
+                    filled_fields.append("✅ Email filled")
                     logger.info(f"✅ Email filled: {form_data['email']}")
                     
                     # Highlight the field
@@ -406,7 +406,7 @@ class SimpleTorrentRPA:
             
             # 6. Skip submit - let user handle captcha
             logger.info("⚠️ Captcha detected - form filled, user needs to solve captcha and submit manually")
-            filled_fields.append("Form filled - solve captcha to submit")
+            filled_fields.append("✅ Form filled successfully")
             
             # Clean completion without popup
             success_count = len([f for f in filled_fields if not f.startswith('❌')])

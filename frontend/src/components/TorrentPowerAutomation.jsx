@@ -42,14 +42,14 @@ const TorrentPowerAutomation = ({ userData, onComplete, onClose }) => {
 
       const automationResult = response.data;
 
-      // Show real-time steps from backend
-      if (automationResult.automation_details && automationResult.automation_details.length > 0) {
-        setProcessingSteps(automationResult.automation_details);
+      // Show real-time steps from backend (filled_fields array)
+      if (automationResult.filled_fields && automationResult.filled_fields.length > 0) {
+        setProcessingSteps(automationResult.filled_fields);
       }
 
       if (automationResult.success) {
         setAutomationStatus('completed');
-        setStatusMessage('Form Submitted Successfully');
+        setStatusMessage('Application Submitted Successfully');
         setResult(automationResult);
         
         if (onComplete) {
@@ -177,8 +177,7 @@ const TorrentPowerAutomation = ({ userData, onComplete, onClose }) => {
           {result && result.success && (
             <div className="mb-4 bg-green-50 border border-green-200 rounded-lg p-6 text-center">
               <CheckCircle className="w-12 h-12 text-green-600 mx-auto mb-3" />
-              <h3 className="text-xl font-bold text-green-800 mb-2">Form Submitted Successfully</h3>
-              <p className="text-green-700">Torrent Power will contact you soon.</p>
+              <h3 className="text-xl font-bold text-green-800">Application Submitted Successfully</h3>
             </div>
           )}
 
