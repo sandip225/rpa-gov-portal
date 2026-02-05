@@ -219,7 +219,7 @@ class SimpleTorrentRPA:
         try:
             logger.info("🚀 Starting form filling...")
             filled_fields = []
-            time.sleep(2)  # Wait for page to fully load
+            time.sleep(1)  # Wait for page to fully load
             
             # 1. Fill City Dropdown
             try:
@@ -241,7 +241,7 @@ class SimpleTorrentRPA:
                         self.driver.execute_script("arguments[0].style.backgroundColor = '#d4edda'; arguments[0].style.border = '3px solid #28a745';", city_select)
                         break
                 
-                time.sleep(1)
+                time.sleep(0.3)
                 
             except Exception as e:
                 logger.error(f"❌ City dropdown error: {e}")
@@ -281,7 +281,7 @@ class SimpleTorrentRPA:
                 else:
                     filled_fields.append("❌ Service Number field not found")
                 
-                time.sleep(1)
+                time.sleep(0.3)
                 
             except Exception as e:
                 logger.error(f"❌ Service Number error: {e}")
@@ -320,7 +320,7 @@ class SimpleTorrentRPA:
                 else:
                     filled_fields.append("❌ T Number field not found")
                 
-                time.sleep(1)
+                time.sleep(0.3)
                 
             except Exception as e:
                 logger.error(f"❌ T Number error: {e}")
@@ -359,7 +359,7 @@ class SimpleTorrentRPA:
                 else:
                     filled_fields.append("❌ Mobile field not found")
                 
-                time.sleep(1)
+                time.sleep(0.3)
                 
             except Exception as e:
                 logger.error(f"❌ Mobile error: {e}")
@@ -398,7 +398,7 @@ class SimpleTorrentRPA:
                 else:
                     filled_fields.append("❌ Email field not found")
                 
-                time.sleep(1)
+                time.sleep(0.3)
                 
             except Exception as e:
                 logger.error(f"❌ Email error: {e}")
@@ -444,7 +444,7 @@ class SimpleTorrentRPA:
                     
                     # Scroll to submit button
                     self.driver.execute_script("arguments[0].scrollIntoView(true);", submit_button)
-                    time.sleep(1)
+                    time.sleep(0.5)
                     
                     # Click submit button
                     submit_button.click()
@@ -522,9 +522,9 @@ class SimpleTorrentRPA:
             # Fill the form
             result = self.fill_form(form_data)
             
-            # Keep browser open for user interaction (5 minutes)
-            logger.info("🕐 Keeping browser open for 5 minutes for user interaction...")
-            time.sleep(300)
+            # Reduce wait time from 5 minutes to 30 seconds
+            logger.info("🕐 Keeping browser open for 30 seconds for user interaction...")
+            time.sleep(30)
             
             return result
             

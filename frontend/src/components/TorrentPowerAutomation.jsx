@@ -14,23 +14,6 @@ const TorrentPowerAutomation = ({ userData, onComplete, onClose }) => {
       setStatusMessage('Processing...');
       setProcessingSteps([]);
 
-      // Simulate processing steps
-      const steps = [
-        'Opening Torrent Power website...',
-        'Filling city field...',
-        'Filling service number...',
-        'Filling transaction number...',
-        'Filling mobile number...',
-        'Filling email address...',
-        'Submitting form...'
-      ];
-
-      // Show steps one by one
-      for (let i = 0; i < steps.length; i++) {
-        await new Promise(resolve => setTimeout(resolve, 800));
-        setProcessingSteps(prev => [...prev, steps[i]]);
-      }
-
       // Debug: Log the userData to see what we're getting
       console.log('🔍 Debug - userData received:', userData);
 
@@ -58,6 +41,11 @@ const TorrentPowerAutomation = ({ userData, onComplete, onClose }) => {
       console.log('📥 Response received:', response.data);
 
       const automationResult = response.data;
+
+      // Show real-time steps from backend
+      if (automationResult.automation_details && automationResult.automation_details.length > 0) {
+        setProcessingSteps(automationResult.automation_details);
+      }
 
       if (automationResult.success) {
         setAutomationStatus('completed');
@@ -131,7 +119,7 @@ const TorrentPowerAutomation = ({ userData, onComplete, onClose }) => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Bot className="w-6 h-6 text-white" />
-              <h2 className="text-lg font-bold text-white">Torrent Power Automation</h2>
+              <h2 className="text-lg font-bold text-white">Torrent Power Name Change Application</h2>
             </div>
             <button
               onClick={onClose}
