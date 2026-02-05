@@ -20,11 +20,11 @@ services:
       - ENVIRONMENT=production
       - DEBUG=false
       # Frontend Configuration
-      - FRONTEND_URL=http://13.233.164.201:3000
+      - FRONTEND_URL=http://3.109.186.73:3000
       # API Configuration
       - API_V1_STR=/api
       # CORS Settings - Allow frontend access
-      - BACKEND_CORS_ORIGINS=["http://13.233.164.201:3000","http://localhost:3000","http://13.233.164.201","http://localhost"]
+      - BACKEND_CORS_ORIGINS=["http://3.109.186.73:3000","http://localhost:3000","http://3.109.186.73","http://localhost"]
       # RPA Configuration (No OpenAI needed)
       - RPA_MODE=PRODUCTION
       - OPENAI_API_KEY=""

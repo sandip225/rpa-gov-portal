@@ -85,6 +85,38 @@ class SimpleTorrentRPA:
                 driver_path = ChromeDriverManager().install()
                 logger.info(f"✅ ChromeDriver installed at: {driver_path}")
                 
+                # Fix path if needed (Linux issue) - webdriver-manager bug
+                if is_linux:
+                    # The path often points to THIRD_PARTY_NOTICES instead of chromedriver
+                    if 'THIRD_PARTY_NOTICES' in driver_path or not driver_path.endswith('chromedriver'):
+                        # Get the directory
+                        driver_dir = os.path.dirname(driver_path)
+                        
+                        # Look for actual chromedriver binary
+                        possible_paths = [
+                            os.path.join(driver_dir, 'chromedriver'),
+                            os.path.join(driver_dir, '..', 'chromedriver'),
+                            os.path.join(driver_dir, 'chromedriver-linux64', 'chromedriver'),
+                        ]
+                        
+                        for possible_path in possible_paths:
+                            abs_path = os.path.abspath(possible_path)
+                            if os.path.exists(abs_path) and os.path.isfile(abs_path):
+                                driver_path = abs_path
+                                logger.info(f"🔧 Fixed ChromeDriver path: {driver_path}")
+                                break
+                        
+                        # If still not found, search the entire directory tree
+                        if 'THIRD_PARTY_NOTICES' in driver_path:
+                            base_dir = os.path.dirname(os.path.dirname(driver_path))
+                            for root, dirs, files in os.walk(base_dir):
+                                if 'chromedriver' in files:
+                                    potential_driver = os.path.join(root, 'chromedriver')
+                                    if os.access(potential_driver, os.X_OK) or not os.path.islink(potential_driver):
+                                        driver_path = potential_driver
+                                        logger.info(f"🔍 Found ChromeDriver binary: {driver_path}")
+                                        break
+                
                 # Fix path if needed (Windows issue)
                 if is_windows and ('THIRD_PARTY_NOTICES' in driver_path or not driver_path.endswith('.exe')):
                     driver_dir = os.path.dirname(driver_path)
@@ -99,25 +131,12 @@ class SimpleTorrentRPA:
                             logger.info(f"🔧 Fixed ChromeDriver path: {driver_path}")
                             break
                 
-                # Fix path if needed (Linux issue)
-                if is_linux and not driver_path.endswith('chromedriver'):
-                    driver_dir = os.path.dirname(driver_path)
-                    possible_paths = [
-                        os.path.join(driver_dir, 'chromedriver'),
-                        os.path.join(driver_dir, 'chromedriver-linux64', 'chromedriver'),
-                    ]
-                    
-                    for possible_path in possible_paths:
-                        if os.path.exists(possible_path):
-                            driver_path = possible_path
-                            logger.info(f"🔧 Fixed ChromeDriver path: {driver_path}")
-                            break
-                
-                if os.path.exists(driver_path):
+                if os.path.exists(driver_path) and os.path.isfile(driver_path):
                     # Make executable on Linux
                     if is_linux:
                         try:
                             os.chmod(driver_path, stat.S_IRWXU | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH)
+                            logger.info(f"✅ Made ChromeDriver executable: {driver_path}")
                         except Exception as chmod_error:
                             logger.warning(f"⚠️ Could not chmod driver: {chmod_error}")
                     
@@ -125,14 +144,23 @@ class SimpleTorrentRPA:
                     self.driver = webdriver.Chrome(service=service, options=options)
                     logger.info("✅ Chrome driver setup successful with webdriver-manager")
                 else:
+                    logger.warning(f"⚠️ ChromeDriver path invalid: {driver_path}")
                     raise FileNotFoundError(f"ChromeDriver not found at {driver_path}")
                 
             except Exception as wdm_error:
                 logger.warning(f"⚠️ webdriver-manager failed: {wdm_error}")
-                logger.info("🔧 Trying system Chrome...")
+                logger.info("🔧 Trying system ChromeDriver at /usr/bin/chromedriver...")
+                
+                # Try system ChromeDriver directly
                 try:
-                    self.driver = webdriver.Chrome(options=options)
-                    logger.info("✅ Chrome driver setup successful with system Chrome")
+                    if is_linux and os.path.exists('/usr/bin/chromedriver'):
+                        service = Service('/usr/bin/chromedriver')
+                        self.driver = webdriver.Chrome(service=service, options=options)
+                        logger.info("✅ Chrome driver setup successful with /usr/bin/chromedriver")
+                    else:
+                        logger.info("🔧 Trying system Chrome from PATH...")
+                        self.driver = webdriver.Chrome(options=options)
+                        logger.info("✅ Chrome driver setup successful with system Chrome")
                 except Exception as sys_error:
                     logger.error(f"❌ System Chrome also failed: {sys_error}")
                     raise
