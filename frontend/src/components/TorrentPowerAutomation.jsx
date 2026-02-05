@@ -42,9 +42,24 @@ const TorrentPowerAutomation = ({ userData, onComplete, onClose }) => {
 
       const automationResult = response.data;
 
-      // Show real-time steps from backend (filled_fields array)
-      if (automationResult.filled_fields && automationResult.filled_fields.length > 0) {
-        setProcessingSteps(automationResult.filled_fields);
+      console.log('🔍 Debug - automation_details:', automationResult.automation_details);
+      console.log('🔍 Debug - filled_fields:', automationResult.filled_fields);
+      console.log('🔍 Debug - Full response:', JSON.stringify(automationResult, null, 2));
+
+      // Show steps one by one with animation (real-time effect)
+      if (automationResult.automation_details && automationResult.automation_details.length > 0) {
+        console.log('✅ Animating processing steps:', automationResult.automation_details);
+        
+        // Show steps one by one with delay
+        for (let i = 0; i < automationResult.automation_details.length; i++) {
+          await new Promise(resolve => setTimeout(resolve, 500)); // 500ms delay between each step
+          setProcessingSteps(prev => [...prev, automationResult.automation_details[i]]);
+        }
+        
+        // Keep showing steps for a moment before marking as completed
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      } else {
+        console.log('⚠️ No automation_details found in response');
       }
 
       if (automationResult.success) {
@@ -160,11 +175,11 @@ const TorrentPowerAutomation = ({ userData, onComplete, onClose }) => {
               </div>
 
               {/* Processing Steps */}
-              {automationStatus === 'running' && processingSteps.length > 0 && (
+              {(automationStatus === 'running' || automationStatus === 'completed') && processingSteps.length > 0 && (
                 <div className="mt-3 space-y-1">
                   {processingSteps.map((step, index) => (
-                    <div key={index} className="flex items-center gap-2 text-sm text-blue-700">
-                      <CheckCircle className="w-4 h-4" />
+                    <div key={index} className="flex items-center gap-2 text-sm text-green-700">
+                      <CheckCircle className="w-4 h-4 text-green-600" />
                       <span>{step}</span>
                     </div>
                   ))}

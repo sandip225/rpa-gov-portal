@@ -292,12 +292,8 @@ const NameChangeApplication = () => {
   };
 
   const handleAutomationComplete = (result) => {
-    console.log('Automation completed:', result);
-    if (result.success) {
-      alert(`✅ Automation Completed!\n\n${result.message}\n\nNext Steps:\n${result.next_steps?.join('\n') || 'Complete the form manually in the browser window.'}`);
-    } else {
-      alert(`❌ Automation Failed!\n\n${result.error || result.message}`);
-    }
+    console.log('Application Submitted Successfully', result);
+    // Modal will show success/failure message - no need for alert
   };
 
   const handleCloseAutomation = () => {
