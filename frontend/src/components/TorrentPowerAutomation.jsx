@@ -6,11 +6,30 @@ const TorrentPowerAutomation = ({ userData, onComplete, onClose }) => {
   const [automationStatus, setAutomationStatus] = useState('idle'); // idle, running, completed, failed
   const [result, setResult] = useState(null);
   const [statusMessage, setStatusMessage] = useState('');
+  const [processingSteps, setProcessingSteps] = useState([]);
 
   const startAutomation = async () => {
     try {
       setAutomationStatus('running');
-      setStatusMessage('🚀 Starting automation...');
+      setStatusMessage('Processing...');
+      setProcessingSteps([]);
+
+      // Simulate processing steps
+      const steps = [
+        'Opening Torrent Power website...',
+        'Filling city field...',
+        'Filling service number...',
+        'Filling transaction number...',
+        'Filling mobile number...',
+        'Filling email address...',
+        'Submitting form...'
+      ];
+
+      // Show steps one by one
+      for (let i = 0; i < steps.length; i++) {
+        await new Promise(resolve => setTimeout(resolve, 800));
+        setProcessingSteps(prev => [...prev, steps[i]]);
+      }
 
       // Debug: Log the userData to see what we're getting
       console.log('🔍 Debug - userData received:', userData);
@@ -42,7 +61,7 @@ const TorrentPowerAutomation = ({ userData, onComplete, onClose }) => {
 
       if (automationResult.success) {
         setAutomationStatus('completed');
-        setStatusMessage('✅ Form auto-filled successfully!');
+        setStatusMessage('Form Submitted Successfully');
         setResult(automationResult);
         
         if (onComplete) {
@@ -50,7 +69,7 @@ const TorrentPowerAutomation = ({ userData, onComplete, onClose }) => {
         }
       } else {
         setAutomationStatus('failed');
-        setStatusMessage(`❌ Automation failed: ${automationResult.message}`);
+        setStatusMessage(`Automation failed: ${automationResult.message}`);
         setResult(automationResult);
       }
 
@@ -71,7 +90,7 @@ const TorrentPowerAutomation = ({ userData, onComplete, onClose }) => {
         errorMessage = 'Server error. Please try again later.';
       }
       
-      setStatusMessage(`❌ ${errorMessage}`);
+      setStatusMessage(errorMessage);
       setResult({
         success: false,
         error: errorMessage,
@@ -148,39 +167,37 @@ const TorrentPowerAutomation = ({ userData, onComplete, onClose }) => {
                   automationStatus === 'failed' ? 'text-red-800' :
                   'text-gray-800'
                 }`}>
-                  {statusMessage || 'Ready to start automation'}
+                  {statusMessage || 'Start Processing'}
                 </p>
               </div>
+
+              {/* Processing Steps */}
+              {automationStatus === 'running' && processingSteps.length > 0 && (
+                <div className="mt-3 space-y-1">
+                  {processingSteps.map((step, index) => (
+                    <div key={index} className="flex items-center gap-2 text-sm text-blue-700">
+                      <CheckCircle className="w-4 h-4" />
+                      <span>{step}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
-          {/* Results Display */}
+          {/* Success Message */}
           {result && result.success && (
-            <div className="mb-4 bg-green-50 border border-green-200 rounded-lg p-4">
-              <h3 className="font-semibold text-green-800 mb-2">🚀 Auto-fill Launcher Started!</h3>
-              <p className="text-sm text-green-700 mb-3">
-                The auto-fill launcher has been opened and will automatically fill the Torrent Power form!
-              </p>
-              {result.next_steps && (
-                <div className="text-sm text-green-700">
-                  <p className="font-medium mb-2">🤖 Automatic Process:</p>
-                  <ol className="list-decimal list-inside space-y-1 bg-white p-3 rounded border">
-                    <li>Auto-fill launcher opened in new tab</li>
-                    <li>Torrent Power website opens automatically</li>
-                    <li>Form fields get filled automatically</li>
-                    <li>Review the data and submit</li>
-                  </ol>
-                </div>
-              )}
-              <div className="mt-3 p-2 bg-blue-50 rounded text-xs text-blue-700">
-                💡 <strong>Tip:</strong> If the auto-fill doesn't work, check the launcher tab for manual options
-              </div>
+            <div className="mb-4 bg-green-50 border border-green-200 rounded-lg p-6 text-center">
+              <CheckCircle className="w-12 h-12 text-green-600 mx-auto mb-3" />
+              <h3 className="text-xl font-bold text-green-800 mb-2">Form Submitted Successfully</h3>
+              <p className="text-green-700">Torrent Power will contact you soon.</p>
             </div>
           )}
 
+          {/* Error Message */}
           {result && !result.success && (
             <div className="mb-4 bg-red-50 border border-red-200 rounded-lg p-4">
-              <h3 className="font-semibold text-red-800 mb-2">❌ Automation Failed</h3>
+              <h3 className="font-semibold text-red-800 mb-2">Automation Failed</h3>
               <p className="text-sm text-red-700">{result.message || result.error}</p>
             </div>
           )}
@@ -190,20 +207,21 @@ const TorrentPowerAutomation = ({ userData, onComplete, onClose }) => {
             {automationStatus === 'idle' && (
               <button
                 onClick={startAutomation}
-                className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-lg font-medium hover:from-blue-700 hover:to-purple-700 transition-colors flex items-center justify-center gap-2"
+                className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-3 rounded-lg font-medium hover:from-blue-700 hover:to-purple-700 transition-colors flex items-center justify-center gap-2"
               >
-                <Play className="w-4 h-4" />
-                Start Auto-fill
+                <Play className="w-5 h-5" />
+                Start
               </button>
             )}
             
-            <button
-              onClick={openTorrentPowerManually}
-              className="flex-1 bg-gray-100 text-gray-700 px-4 py-2 rounded-lg font-medium hover:bg-gray-200 transition-colors flex items-center justify-center gap-2"
-            >
-              <ExternalLink className="w-4 h-4" />
-              Open Manually
-            </button>
+            {automationStatus === 'completed' && (
+              <button
+                onClick={onClose}
+                className="flex-1 bg-green-600 text-white px-4 py-3 rounded-lg font-medium hover:bg-green-700 transition-colors"
+              >
+                OK
+              </button>
+            )}
           </div>
         </div>
       </div>
