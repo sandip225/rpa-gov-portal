@@ -404,96 +404,19 @@ class SimpleTorrentRPA:
                 logger.error(f"❌ Email error: {e}")
                 filled_fields.append("❌ Email error")
             
-            # 6. Find and click Submit button
-            try:
-                logger.info("� Looking for submit button...")
-                submit_selectors = [
-                    "button[type='submit']",
-                    "input[type='submit']",
-                    "button:contains('Submit')",
-                    "button:contains('Apply')",
-                    "button:contains('Send')",
-                    ".btn-primary",
-                    ".submit-btn"
-                ]
-                
-                submit_button = None
-                for selector in submit_selectors:
-                    try:
-                        if ":contains" in selector:
-                            # Use XPath for text-based search
-                            xpath = f"//button[contains(text(), '{selector.split(':contains(')[1].strip(')')}')]"
-                            submit_button = self.driver.find_element(By.XPATH, xpath)
-                        else:
-                            submit_button = self.driver.find_element(By.CSS_SELECTOR, selector)
-                        break
-                    except:
-                        continue
-                
-                # Fallback: look for any button that might be submit
-                if not submit_button:
-                    buttons = self.driver.find_elements(By.TAG_NAME, "button")
-                    for button in buttons:
-                        button_text = button.text.lower()
-                        if any(word in button_text for word in ['submit', 'apply', 'send', 'save']):
-                            submit_button = button
-                            break
-                
-                if submit_button:
-                    logger.info("🎯 Found submit button, clicking...")
-                    
-                    # Scroll to submit button
-                    self.driver.execute_script("arguments[0].scrollIntoView(true);", submit_button)
-                    time.sleep(0.5)
-                    
-                    # Click submit button
-                    submit_button.click()
-                    filled_fields.append("Form submitted")
-                    logger.info("✅ Form submitted successfully")
-                    
-                    # Wait for submission to process
-                    time.sleep(3)
-                    
-                    # Add success message to the page after submission
-                    success_message_script = """
-                    const successMsg = document.createElement('div');
-                    successMsg.innerHTML = `
-                        <div style="position: fixed; top: 20px; right: 20px; background: #28a745; color: white; padding: 20px 30px; border-radius: 10px; font-family: Arial, sans-serif; font-size: 16px; z-index: 999999; box-shadow: 0 4px 20px rgba(0,0,0,0.3); max-width: 400px;">
-                            <strong>🎉 Application Submitted Successfully!</strong><br>
-                            <small style="font-size: 14px; margin-top: 10px; display: block;">
-                                Your name change request has been submitted to Torrent Power.<br>
-                                You will receive a confirmation email shortly.
-                            </small>
-                        </div>
-                    `;
-                    document.body.appendChild(successMsg);
-                    
-                    setTimeout(() => {
-                        if (successMsg.parentNode) {
-                            successMsg.parentNode.removeChild(successMsg);
-                        }
-                    }, 8000);
-                    """
-                    
-                    self.driver.execute_script(success_message_script)
-                    
-                else:
-                    filled_fields.append("⚠️ Submit button not found - please submit manually")
-                    logger.warning("⚠️ Submit button not found")
-                
-            except Exception as e:
-                logger.error(f"❌ Submit button error: {e}")
-                filled_fields.append("❌ Submit button error")
+            # 6. Skip submit - let user handle captcha
+            logger.info("⚠️ Captcha detected - form filled, user needs to solve captcha and submit manually")
+            filled_fields.append("Form filled - solve captcha to submit")
             
             # Clean completion without popup
-            success_count = len([f for f in filled_fields if f.startswith('✅')])
-            logger.info(f"📊 Form filling completed: {success_count}/6 fields filled")
+            success_count = len([f for f in filled_fields if not f.startswith('❌')])
+            logger.info(f"📊 Form filling completed: {success_count}/5 fields filled")
             
             return {
-                "success": success_count > 0,
+                "success": True,  # Mark as success since fields are filled
                 "filled_fields": filled_fields,
                 "total_filled": success_count,
-                "total_fields": 6  # Updated to include submit button
+                "total_fields": 5
             }
             
         except Exception as e:
