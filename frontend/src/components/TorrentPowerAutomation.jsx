@@ -134,7 +134,7 @@ const TorrentPowerAutomation = ({ userData, onComplete, onClose }) => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Bot className="w-6 h-6 text-white" />
-              <h2 className="text-lg font-bold text-white">Torrent Power Name Change Application</h2>
+              <h2 className="text-lg font-bold text-white">Torrent Power | Name Change Application</h2>
             </div>
             <button
               onClick={onClose}
@@ -153,24 +153,24 @@ const TorrentPowerAutomation = ({ userData, onComplete, onClose }) => {
             <div className={`p-4 rounded-lg border ${
               automationStatus === 'idle' ? 'bg-gray-50 border-gray-200' :
               automationStatus === 'running' ? 'bg-blue-50 border-blue-200' :
-              automationStatus === 'completed' ? 'bg-green-50 border-green-200' :
+              automationStatus === 'completed' ? 'bg-red-50 border-red-200' :
               'bg-red-50 border-red-200'
             }`}>
               <div className="flex items-center gap-3">
                 {automationStatus === 'running' && (
                   <div className="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
                 )}
-                {automationStatus === 'completed' && <CheckCircle className="w-5 h-5 text-green-600" />}
+                {automationStatus === 'completed' && <AlertCircle className="w-5 h-5 text-red-600" />}
                 {automationStatus === 'failed' && <AlertCircle className="w-5 h-5 text-red-600" />}
                 {automationStatus === 'idle' && <Bot className="w-5 h-5 text-gray-600" />}
                 
                 <p className={`font-medium ${
                   automationStatus === 'running' ? 'text-blue-800' :
-                  automationStatus === 'completed' ? 'text-green-800' :
+                  automationStatus === 'completed' ? 'text-red-800' :
                   automationStatus === 'failed' ? 'text-red-800' :
                   'text-gray-800'
                 }`}>
-                  {statusMessage || 'Start Processing'}
+                  {automationStatus === 'completed' ? 'Application is not Submitted Successfully' : statusMessage || 'Start Processing'}
                 </p>
               </div>
 
@@ -178,8 +178,14 @@ const TorrentPowerAutomation = ({ userData, onComplete, onClose }) => {
               {(automationStatus === 'running' || automationStatus === 'completed') && processingSteps.length > 0 && (
                 <div className="mt-3 space-y-1">
                   {processingSteps.map((step, index) => (
-                    <div key={index} className="flex items-center gap-2 text-sm text-green-700">
-                      <CheckCircle className="w-4 h-4 text-green-600" />
+                    <div key={index} className={`flex items-center gap-2 text-sm ${
+                      step.startsWith('❌') ? 'text-red-700' : 'text-green-700'
+                    }`}>
+                      {step.startsWith('❌') ? (
+                        <AlertCircle className="w-4 h-4 text-red-600" />
+                      ) : (
+                        <CheckCircle className="w-4 h-4 text-green-600" />
+                      )}
                       <span>{step}</span>
                     </div>
                   ))}
@@ -188,18 +194,19 @@ const TorrentPowerAutomation = ({ userData, onComplete, onClose }) => {
             </div>
           </div>
 
-          {/* Success Message */}
+          {/* Success Message - Actually shows restriction message */}
           {result && result.success && (
-            <div className="mb-4 bg-green-50 border border-green-200 rounded-lg p-6 text-center">
-              <CheckCircle className="w-12 h-12 text-green-600 mx-auto mb-3" />
-              <h3 className="text-xl font-bold text-green-800">Application Submitted Successfully</h3>
+            <div className="mb-4 bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+              <AlertCircle className="w-12 h-12 text-red-600 mx-auto mb-3" />
+              <h3 className="text-xl font-bold text-red-800">Application has not been submitted due to incorrect data.</h3>
             </div>
           )}
 
           {/* Error Message */}
           {result && !result.success && (
-            <div className="mb-4 bg-red-50 border border-red-200 rounded-lg p-4">
-              <h3 className="font-semibold text-red-800 mb-2">Automation Failed</h3>
+            <div className="mb-4 bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+              <AlertCircle className="w-12 h-12 text-red-600 mx-auto mb-3" />
+              <h3 className="text-xl font-bold text-red-800 mb-2">Application has not been submitted due to incorrect data.</h3>
               <p className="text-sm text-red-700">{result.message || result.error}</p>
             </div>
           )}

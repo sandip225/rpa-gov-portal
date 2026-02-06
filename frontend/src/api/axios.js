@@ -10,7 +10,7 @@ const getApiBaseUrl = () => {
   // Development: localhost or 127.0.0.1
   if (hostname === 'localhost' || hostname === '127.0.0.1') {
     console.log('✅ Using localhost backend');
-    return 'http://3.109.186.73:8000/api';
+    return 'http://3.144.198.232:8000/api';
   }
   
   // Production: If accessing via IP address, use same IP for backend

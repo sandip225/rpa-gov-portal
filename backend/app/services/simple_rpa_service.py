@@ -404,16 +404,16 @@ class SimpleTorrentRPA:
                 logger.error(f"❌ Email error: {e}")
                 filled_fields.append("❌ Email error")
             
-            # 6. Skip submit - let user handle captcha
+            # 6. Form filled but not submitted (captcha restriction)
             logger.info("⚠️ Captcha detected - form filled, user needs to solve captcha and submit manually")
-            filled_fields.append("✅ Form filled successfully")
+            filled_fields.append("❌ Form is not filled successfully")
             
             # Clean completion without popup
-            success_count = len([f for f in filled_fields if not f.startswith('❌')])
+            success_count = len([f for f in filled_fields if f.startswith('✅')])
             logger.info(f"📊 Form filling completed: {success_count}/5 fields filled")
             
             return {
-                "success": True,  # Mark as success since fields are filled
+                "success": True,  # Fields are filled, but not submitted
                 "filled_fields": filled_fields,
                 "total_filled": success_count,
                 "total_fields": 5
